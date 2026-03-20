@@ -5,6 +5,7 @@ import {Menu, X} from 'lucide-react'
 import React, {useEffect, useState} from 'react'
 import BinaryHover from '@/components/binary-hover'
 import {useLanguage} from '@/lib/language-context'
+import ChatModal from '@/components/chat-modal'
 
 const serviceColumns = [
     {
@@ -63,6 +64,7 @@ function LangSwitch({lightNav}: { lightNav: boolean }) {
 
 export const HeroHeader = () => {
     const [menuOpen, setMenuOpen] = React.useState(false)
+    const [chatOpen, setChatOpen] = React.useState(false)
     const [lightNav, setLightNav] = useState(false)
 
     // Observe white/light sections to toggle nav theme
@@ -132,14 +134,15 @@ export const HeroHeader = () => {
                             />
                         </Link>
 
-                        {/* Center — search pill */}
+                        {/* Center — search pill (opens chat) */}
                         <div className="hidden md:flex items-center">
-                            <div className={`flex items-center gap-2 px-5 py-2 rounded-full border ${borderColor} ${lightNav ? 'bg-black/5' : 'bg-black/30'} backdrop-blur-xl cursor-pointer hover:${lightNav ? 'border-black/20' : 'border-white/20'} transition-colors`}>
+                            <button onClick={() => setChatOpen(true)}
+                                className={`flex items-center gap-2 px-5 py-2 rounded-full border ${borderColor} ${lightNav ? 'bg-black/5' : 'bg-black/30'} backdrop-blur-xl cursor-pointer hover:${lightNav ? 'border-black/20' : 'border-white/20'} transition-colors`}>
                                 <span className={`text-sm font-mono transition-colors duration-300 ${mutedColor}`}>Chiedici qualsiasi cosa</span>
                                 <svg className={`w-4 h-4 transition-colors duration-300 ${mutedColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                 </svg>
-                            </div>
+                            </button>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -173,12 +176,13 @@ export const HeroHeader = () => {
                 <div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" onClick={() => setMenuOpen(false)}/>
                 <div className={`relative z-10 mx-auto max-w-6xl px-6 pt-24 pb-8 h-full flex flex-col transition-all duration-500 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}`}>
                     <div className="md:hidden mb-8">
-                        <div className="flex items-center gap-2 px-5 py-3 rounded-full border border-white/10 bg-black/30 backdrop-blur-xl">
+                        <button onClick={() => { setMenuOpen(false); setChatOpen(true) }}
+                            className="w-full flex items-center gap-2 px-5 py-3 rounded-full border border-white/10 bg-black/30 backdrop-blur-xl cursor-pointer">
                             <span className="text-sm text-white/40 font-mono">Chiedici qualsiasi cosa</span>
                             <svg className="w-4 h-4 text-white/30 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
-                        </div>
+                        </button>
                     </div>
 
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 py-8 overflow-y-auto">
@@ -227,6 +231,8 @@ export const HeroHeader = () => {
                     </div>
                 </div>
             </div>
+            {/* Chat modal */}
+            <ChatModal open={chatOpen} onClose={() => setChatOpen(false)}/>
         </header>
     )
 }

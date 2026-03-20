@@ -5,7 +5,10 @@ import Image from 'next/image'
 const PARTICLE_COUNT = 80
 
 export default function SplashScreen() {
-    const [visible, setVisible] = useState(true)
+    const [visible, setVisible] = useState(() => {
+        if (typeof window !== 'undefined') return !sessionStorage.getItem('ey-entered')
+        return false
+    })
     const [entered, setEntered] = useState(false)
     const topRef = useRef<HTMLDivElement>(null)
     const bottomRef = useRef<HTMLDivElement>(null)
@@ -63,14 +66,15 @@ export default function SplashScreen() {
         }
         // Disable scroll until entered
         document.body.style.overflow = 'hidden'
-        return () => { document.body.style.overflow = '' }
+        return () => { document.body.style.overflowY = 'auto'; document.body.style.overflowX = 'hidden' }
     }, [])
 
     const handleEnter = useCallback(async () => {
         if (entered) return
         setEntered(true)
         sessionStorage.setItem('ey-entered', '1')
-        document.body.style.overflow = ''
+        document.body.style.overflowY = 'auto'
+        document.body.style.overflowX = 'hidden'
 
         try {
             const gsap = (await import('gsap')).default

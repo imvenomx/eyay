@@ -1,6 +1,6 @@
 'use client'
 
-import {useCallback, useEffect, useRef, useState, startTransition} from 'react'
+import {useCallback, useEffect, useRef, useState} from 'react'
 import {useRouter, usePathname} from 'next/navigation'
 
 function getPageLabel(href: string): string {
@@ -18,33 +18,39 @@ export default function TransitionOverlay() {
     const textRef = useRef<HTMLDivElement>(null)
     const overlayRef = useRef<HTMLDivElement>(null)
     const isAnimating = useRef(false)
-    const pendingHref = useRef<string | null>(null)
 
-    // When pathname changes (navigation complete), open doors
+    // On mount: open doors if arriving from a transition
     useEffect(() => {
-        if (!pendingHref.current) return
-        if (pathname !== pendingHref.current) return
-        pendingHref.current = null
+        const flag = sessionStorage.getItem('ey-nav')
+        if (!flag) return
+        sessionStorage.removeItem('ey-nav')
 
         const top = topRef.current, bottom = bottomRef.current, text = textRef.current
-        if (!top || !bottom || !text) { isAnimating.current = false; return }
+        if (!top || !bottom || !text) return
+
+        top.style.display = 'block'
+        top.style.transform = 'translateY(0)'
+        bottom.style.display = 'block'
+        bottom.style.transform = 'translateY(0)'
+        text.style.display = 'flex'
+        text.style.opacity = '1'
+        setLabel(flag)
 
         const timer = setTimeout(async () => {
             try {
                 const gsap = (await import('gsap')).default
                 window.scrollTo(0, 0)
-                gsap.timeline({onComplete: () => { isAnimating.current = false }})
+                gsap.timeline()
                     .to(text, {opacity: 0, duration: 0.25}, '+=0.4')
                     .to(top, {yPercent: -100, duration: 0.6, ease: 'power3.inOut'})
                     .to(bottom, {yPercent: 100, duration: 0.6, ease: 'power3.inOut'}, '<')
                     .set([top, bottom, text], {display: 'none'})
-            } catch { isAnimating.current = false }
-        }, 100)
+            } catch {}
+        }, 200)
 
         return () => clearTimeout(timer)
-    }, [pathname])
+    }, [])
 
-    // Intercept link clicks
     useEffect(() => {
         const handleClick = async (e: MouseEvent) => {
             const anchor = (e.target as HTMLElement).closest('a[href]')
@@ -58,9 +64,11 @@ export default function TransitionOverlay() {
             const cleanPathname = pathname.split('#')[0] || '/'
             if (cleanHref === cleanPathname) return
 
+            // Skip transition from homepage (R3F Canvas causes DOM errors)
+            if (cleanPathname === '/') return
+
             e.preventDefault()
             isAnimating.current = true
-            pendingHref.current = cleanHref
 
             const pageLabel = getPageLabel(href)
             setLabel(pageLabel)
@@ -73,7 +81,6 @@ export default function TransitionOverlay() {
                 bottom.style.display = 'block'
                 text.style.display = 'flex'
 
-                // Close doors
                 await new Promise<void>(resolve => {
                     gsap.timeline({onComplete: resolve})
                         .set(top, {yPercent: -100})
@@ -84,12 +91,18 @@ export default function TransitionOverlay() {
                         .to(text, {opacity: 1, duration: 0.3}, '-=0.15')
                 })
 
-                // Navigate using Next.js router (no full reload = no error flash)
-                startTransition(() => {
-                    router.push(href)
-                })
+                // Homepage has R3F Canvas — use full navigation to avoid removeChild error
+                // Other pages use router.push for smooth client-side navigation
+                const isFromHomepage = cleanPathname === '/'
+                if (isFromHomepage) {
+                    sessionStorage.setItem('ey-nav', pageLabel)
+                    window.location.href = href
+                } else {
+                    sessionStorage.setItem('ey-nav', pageLabel)
+                    window.location.href = href
+                }
             } catch {
-                startTransition(() => { router.push(href) })
+                window.location.href = href
             }
         }
 

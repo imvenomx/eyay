@@ -47,11 +47,11 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
     return (
         <html lang="it" className="dark">
         <head>
+            <ErrorSuppressor/>
             <Script src="https://unpkg.com/@splinetool/viewer@1.9.48/build/spline-viewer.js" strategy="lazyOnload" type="module"/>
         </head>
         <body className="font-sans antialiased bg-black">
         <LanguageProvider>
-            <ErrorSuppressor/>
             <SplashScreen/>
             <AudioPlayer/>
             <CustomCursor/>

@@ -22,11 +22,10 @@ export const metadata: Metadata = {
     keywords: ['AI', 'automazione', 'chatbot AI', 'agenti vocali', 'trasformazione digitale', 'CRM', 'RPA', 'machine learning', 'sviluppo web', 'SEO', 'e-commerce', 'Italia'],
     authors: [{name: 'Eey Aay'}],
     creator: 'Eey Aay',
-    metadataBase: new URL('https://eeyaay.com'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://eyay.vercel.app'),
     openGraph: {
         type: 'website',
         locale: 'it_IT',
-        url: 'https://eeyaay.com',
         siteName: 'Eey Aay',
         title: 'Eey Aay — Soluzioni AI & Automazione per Aziende Moderne',
         description: 'Aiutiamo le aziende ad automatizzare i workflow, implementare assistenti AI, migliorare l\'esperienza cliente e costruire sistemi digitali scalabili.',

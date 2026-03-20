@@ -9,32 +9,32 @@ import ChatModal from '@/components/chat-modal'
 
 const serviceColumns = [
     {
-        title: 'AI Solutions',
+        title: 'Soluzioni AI',
         items: [
-            {label: 'AI CHATBOTS', href: '/service/ai-chatbots'},
-            {label: 'AI VOICE AGENTS', href: '/service/ai-voice-agents'},
-            {label: 'RAG / KNOWLEDGE AI', href: '/service/rag-knowledge-ai'},
-            {label: 'CUSTOM GPTS', href: '/service/custom-gpts'},
-            {label: 'WHITE-LABEL AI', href: '/service/white-label-ai'},
+            {label: 'CHATBOT AI', href: '/service/ai-chatbots'},
+            {label: 'AGENTI VOCALI AI', href: '/service/ai-voice-agents'},
+            {label: 'AI BASATA SULLA CONOSCENZA', href: '/service/rag-knowledge-ai'},
+            {label: 'GPT PERSONALIZZATI', href: '/service/custom-gpts'},
+            {label: 'AI WHITE-LABEL', href: '/service/white-label-ai'},
         ],
     },
     {
-        title: 'Automation',
+        title: 'Automazione',
         items: [
-            {label: 'RPA & AUTOMATION', href: '/service/rpa-automation'},
-            {label: 'CRM / ERP INTEGRATION', href: '/service/crm-erp-integration'},
-            {label: 'GOHIGHLEVEL SETUP', href: '/service/gohighlevel'},
-            {label: 'EMAIL AUTOMATION', href: '/service/email-automation'},
+            {label: 'AUTOMAZIONE RPA', href: '/service/rpa-automation'},
+            {label: 'INTEGRAZIONE CRM / ERP', href: '/service/crm-erp-integration'},
+            {label: 'CONFIGURAZIONE GOHIGHLEVEL', href: '/service/gohighlevel'},
+            {label: 'AUTOMAZIONE EMAIL', href: '/service/email-automation'},
         ],
     },
     {
-        title: 'Growth & Data',
+        title: 'Crescita & Dati',
         items: [
-            {label: 'WEB DEVELOPMENT', href: '/service/web-development'},
-            {label: 'SEO & LOCAL SEO', href: '/service/seo'},
+            {label: 'SVILUPPO WEB', href: '/service/web-development'},
+            {label: 'SEO & SEO LOCALE', href: '/service/seo'},
             {label: 'E-COMMERCE', href: '/service/ecommerce'},
             {label: 'BI & MACHINE LEARNING', href: '/service/bi-machine-learning'},
-            {label: 'AI TRAINING', href: '/service/ai-training'},
+            {label: 'FORMAZIONE AI', href: '/service/ai-training'},
         ],
     },
 ]

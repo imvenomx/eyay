@@ -64,7 +64,7 @@ export default function StatsSection() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0">
                         <div className="md:border-r border-black/15 md:pr-12">
                             <p className="text-[10px] font-vcr-mono uppercase tracking-[0.25em] text-black/40 mb-3">{lang === 'it' ? 'Numeri' : 'Numbers'}</p>
-                            <h2 className="text-3xl md:text-5xl font-vcr" style={{fontWeight: 500}}>{lang === 'it' ? 'I nostri risultati' : 'Our results'}</h2>
+                            <h2 className="text-3xl md:text-5xl font-vcr-mono" style={{fontWeight: 500}}>{lang === 'it' ? 'I nostri risultati' : 'Our results'}</h2>
                         </div>
                         <div className="text-[13px] text-black/50 leading-relaxed md:pl-12 md:pt-2">
                             {lang === 'it' ? 'Numeri che parlano da soli. Ogni progetto è una storia di trasformazione, efficienza e crescita concreta.' : 'Numbers that speak for themselves. Every project is a story of transformation, efficiency and real growth.'}

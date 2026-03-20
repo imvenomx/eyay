@@ -24,7 +24,7 @@ function FaqAccordion({item, index}: { item: FaqItem; index: number }) {
                 onClick={() => setOpen(!open)}
                 className="w-full flex items-center justify-between py-5 px-2 text-left cursor-pointer group"
             >
-                <span className="text-sm md:text-base font-vcr-mono text-black/80 group-hover:text-black transition-colors pr-4">
+                <span className="text-base md:text-xl font-vcr text-black/80 group-hover:text-black transition-colors pr-4">
                     {item.q}
                 </span>
                 <span className="shrink-0 w-6 h-6 flex items-center justify-center">

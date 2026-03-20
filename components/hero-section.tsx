@@ -247,8 +247,8 @@ export default function HeroSection() {
     }, [])
 
     return (
-        <div ref={heroRef} className="relative overflow-x-clip" style={{height: '400vh'}}>
-            <div ref={canvasWrapRef} className="sticky top-0 h-screen w-full overflow-hidden">
+        <div ref={heroRef} className="relative" style={{height: '400vh'}}>
+            <div ref={canvasWrapRef} className="sticky top-0 h-screen w-full">
                 <Canvas camera={{position: [0, 0, 8], fov: 50}} dpr={[1, 2]}
                         gl={{antialias: true, alpha: false}} style={{background: '#000000'}}>
                     <Scene scrollProgress={scrollProgress}/>

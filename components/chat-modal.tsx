@@ -42,15 +42,13 @@ export default function ChatModal({open, onClose}: ChatModalProps) {
         setInput('')
     }
 
-    if (!open) return null
-
     return (
-        <div className="fixed inset-0 z-[9997] flex items-center justify-center">
+        <div className={`fixed inset-0 z-[9997] flex items-center justify-center transition-all duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}/>
 
             {/* Modal */}
-            <div className="relative w-full max-w-lg mx-4 h-[70vh] max-h-[600px] bg-[#0a0a0a] border border-white/10 flex flex-col">
+            <div className={`relative w-full max-w-lg mx-4 h-[70vh] max-h-[600px] bg-[#0a0a0a] border border-white/10 flex flex-col transition-all duration-300 ${open ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}>
 
                 {/* Crosshair corners */}
                 <div className="absolute top-0 left-0 w-5 h-px bg-white/30"/>

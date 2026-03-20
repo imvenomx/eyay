@@ -45,12 +45,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang="it" className="dark">
+        <html lang="it" className="dark" suppressHydrationWarning>
         <head>
             <ErrorSuppressor/>
             <Script src="https://unpkg.com/@splinetool/viewer@1.9.48/build/spline-viewer.js" strategy="lazyOnload" type="module"/>
         </head>
-        <body className="font-sans antialiased bg-black">
+        <body className="font-sans antialiased bg-black" suppressHydrationWarning>
         <LanguageProvider>
             <SplashScreen/>
             <AudioPlayer/>

@@ -5,11 +5,17 @@ import Image from 'next/image'
 const PARTICLE_COUNT = 80
 
 export default function SplashScreen() {
-    const [visible, setVisible] = useState(() => {
-        if (typeof window !== 'undefined') return !sessionStorage.getItem('ey-entered')
-        return false
-    })
+    const [visible, setVisible] = useState(false)
     const [entered, setEntered] = useState(false)
+    const [mounted, setMounted] = useState(false)
+
+    // Check on mount only (avoids hydration mismatch)
+    useEffect(() => {
+        if (!sessionStorage.getItem('ey-entered')) {
+            setVisible(true)
+        }
+        setMounted(true)
+    }, [])
     const topRef = useRef<HTMLDivElement>(null)
     const bottomRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -58,26 +64,15 @@ export default function SplashScreen() {
         return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener('resize', resize) }
     }, [visible])
 
-    // Check if already entered this session
+    // Lock scroll when visible
     useEffect(() => {
-        if (sessionStorage.getItem('ey-entered')) {
-            setVisible(false)
-            // Resume audio on page navigation (user already clicked enter before)
-            if (!(window as any).__eyAudio) {
-                try {
-                    const audio = new Audio('/ambient.mp3')
-                    audio.loop = true
-                    audio.volume = 0.02
-                    audio.play().catch(() => {}) // may fail without user gesture
-                    ;(window as any).__eyAudio = audio
-                } catch {}
-            }
-            return
+        if (visible) {
+            document.documentElement.classList.add('no-scroll')
+        } else {
+            document.documentElement.classList.remove('no-scroll')
         }
-        // Disable scroll until entered — use a class to avoid inline style conflicts
-        document.documentElement.classList.add('no-scroll')
         return () => { document.documentElement.classList.remove('no-scroll') }
-    }, [])
+    }, [visible])
 
     const handleEnter = useCallback(async () => {
         if (entered) return

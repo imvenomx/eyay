@@ -1,7 +1,7 @@
 'use client'
 
 import {Canvas, useFrame, useThree} from '@react-three/fiber'
-import {OrbitControls, Html} from '@react-three/drei'
+import {OrbitControls} from '@react-three/drei'
 import * as THREE from 'three'
 import {useRef, useMemo, useEffect, useState, useCallback} from 'react'
 
@@ -120,16 +120,6 @@ function FloatingObject({data, onObjectClick}: { data: (typeof floatingObjects)[
     )
 }
 
-function SceneLabel({data, scrollProgress}: { data: (typeof floatingObjects)[number]; scrollProgress: React.MutableRefObject<number> }) {
-    const ref = useRef<HTMLDivElement>(null)
-    useFrame(() => { if (ref.current) ref.current.style.opacity = String(Math.max(0, 1 - scrollProgress.current * 2.5)) })
-    return (
-        <Html position={data.textPos} className="pointer-events-none select-none">
-            <div ref={ref} className="font-mono text-[10px] text-white/30 whitespace-pre leading-relaxed tracking-[0.15em] uppercase">{data.text}</div>
-        </Html>
-    )
-}
-
 function CameraAnimator({target, isAnimating}: { target: { camPos: THREE.Vector3; lookAt: THREE.Vector3 } | null; isAnimating: React.MutableRefObject<boolean> }) {
     const {camera} = useThree()
     const controlsRef = useRef<any>(null)
@@ -163,7 +153,6 @@ function Scene({scrollProgress}: { scrollProgress: React.MutableRefObject<number
             <ambientLight intensity={0.4}/><pointLight position={[10, 10, 10]} intensity={0.3}/>
             <ParticleSphere scrollProgress={scrollProgress}/>
             {floatingObjects.map(o => <FloatingObject key={o.id} data={o} onObjectClick={handleClick}/>)}
-            {floatingObjects.map(o => <SceneLabel key={`l-${o.id}`} data={o} scrollProgress={scrollProgress}/>)}
             <CameraAnimator target={camTarget} isAnimating={isAnimating}/>
         </>
     )

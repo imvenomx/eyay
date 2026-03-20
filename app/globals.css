@@ -197,6 +197,8 @@ spline-viewer {
 /* Mono accent font — VCR OSD for buttons, labels, small accents */
 .font-vcr-mono {
   font-family: 'VCR OSD Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
 }
 
 /* Custom cursor circle shows alongside default cursor */

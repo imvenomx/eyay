@@ -64,9 +64,6 @@ export default function TransitionOverlay() {
             const cleanPathname = pathname.split('#')[0] || '/'
             if (cleanHref === cleanPathname) return
 
-            // Skip transition from homepage (R3F Canvas causes DOM errors)
-            if (cleanPathname === '/') return
-
             e.preventDefault()
             isAnimating.current = true
 

@@ -1,27 +1,32 @@
 'use client'
 
 /**
- * Injects an inline script into <head> that suppresses R3F removeChild errors
- * BEFORE React or Next.js error overlay can catch them.
+ * Monkey-patches Node.prototype.removeChild to silently handle
+ * the case where the child isn't actually a child of the parent.
+ * This is caused by React Three Fiber creating DOM nodes that
+ * React can't track during unmount. Standard fix for R3F + Next.js.
  */
 export default function ErrorSuppressor() {
     return (
         <script
             dangerouslySetInnerHTML={{
                 __html: `
-                    window.addEventListener('error', function(e) {
-                        if (e.message && (e.message.indexOf('removeChild') !== -1 || e.message.indexOf('NotFoundError') !== -1 || e.message.indexOf('insertBefore') !== -1)) {
-                            e.preventDefault();
-                            e.stopImmediatePropagation();
-                            return false;
-                        }
-                    }, true);
-                    window.addEventListener('unhandledrejection', function(e) {
-                        var msg = (e.reason && e.reason.message) || String(e.reason || '');
-                        if (msg.indexOf('removeChild') !== -1 || msg.indexOf('NotFoundError') !== -1 || msg.indexOf('Context Lost') !== -1) {
-                            e.preventDefault();
-                        }
-                    }, true);
+(function() {
+    var orig = Node.prototype.removeChild;
+    Node.prototype.removeChild = function(child) {
+        if (child && child.parentNode !== this) {
+            return child;
+        }
+        return orig.apply(this, arguments);
+    };
+    var origInsert = Node.prototype.insertBefore;
+    Node.prototype.insertBefore = function(newNode, refNode) {
+        if (refNode && refNode.parentNode !== this) {
+            return newNode;
+        }
+        return origInsert.apply(this, arguments);
+    };
+})();
                 `,
             }}
         />

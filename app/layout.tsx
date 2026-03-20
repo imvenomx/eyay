@@ -9,6 +9,7 @@ import CustomCursor from "@/components/custom-cursor";
 import TransitionOverlay from "@/components/transition-layout";
 import {LanguageProvider} from "@/lib/language-context";
 import SplashScreen from "@/components/splash-screen";
+import AudioPlayer from "@/components/audio-player";
 
 const _geist = Geist({subsets: ["latin"]});
 const _geistMono = Geist_Mono({subsets: ["latin"]});
@@ -50,6 +51,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
         <body className="font-sans antialiased bg-black">
         <LanguageProvider>
             <SplashScreen/>
+            <AudioPlayer/>
             <CustomCursor/>
             <TransitionOverlay/>
             <HeroHeader/>

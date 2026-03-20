@@ -67,7 +67,7 @@ export default function SplashScreen() {
                 try {
                     const audio = new Audio('/ambient.mp3')
                     audio.loop = true
-                    audio.volume = 0.1
+                    audio.volume = 0.02
                     audio.play().catch(() => {}) // may fail without user gesture
                     ;(window as any).__eyAudio = audio
                 } catch {}
@@ -89,7 +89,7 @@ export default function SplashScreen() {
         try {
             const audio = new Audio('/ambient.mp3')
             audio.loop = true
-            audio.volume = 0.1
+            audio.volume = 0.02
             audio.play()
             // Store globally so it persists across the session
             ;(window as any).__eyAudio = audio

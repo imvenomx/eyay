@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Caveat:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 4%;
+
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 45 100% 60%;
+    --accent-foreground: 0 0% 4%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 0% 98%;
+
+    --radius: 0.5rem;
+
+    /* Custom design tokens */
+    --font-display: 'Outfit', sans-serif;
+    --font-handwritten: 'Caveat', cursive;
+    
+    --glow-primary: 0 0 80px hsla(0, 0%, 100%, 0.08);
+    --glow-accent: 0 0 120px hsla(45, 100%, 60%, 0.1);
+    
+    --gradient-radial: radial-gradient(circle at 50% 50%, hsla(0, 0%, 20%, 0.3) 0%, transparent 60%);
+    --gradient-ring: conic-gradient(from 180deg, transparent 0%, hsla(0, 0%, 30%, 0.15) 50%, transparent 100%);
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-display antialiased;
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .font-handwritten {
+    font-family: var(--font-handwritten);
+  }
+
+  .text-massive {
+    font-size: clamp(4rem, 18vw, 16rem);
+    font-weight: 700;
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+  }
+
+  .text-gradient {
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--muted-foreground)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-subtle {
+    box-shadow: var(--glow-primary);
+  }
+
+  .ring-pattern {
+    background-image: var(--gradient-radial);
+  }
+}
+
+@layer utilities {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 30s linear infinite;
+  }
+
+  .animate-fade-up {
+    animation: fade-up 1s ease-out forwards;
+  }
+
+  .animate-fade-up-delay-1 {
+    animation: fade-up 1s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+
+  .animate-fade-up-delay-2 {
+    animation: fade-up 1s ease-out 0.4s forwards;
+    opacity: 0;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 1.2s ease-out forwards;
+  }
+
+  .animate-ring-expand {
+    animation: ring-expand 3s ease-out infinite;
+  }
+
+  .animate-ring-expand-delay {
+    animation: ring-expand 3s ease-out 1s infinite;
+  }
+
+  .animate-ring-expand-delay-2 {
+    animation: ring-expand 3s ease-out 2s infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ring-expand {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}

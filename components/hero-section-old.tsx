@@ -1,0 +1,96 @@
+import React from 'react'
+import Link from 'next/link'
+import {Button} from '@/components/ui/button'
+import {TextEffect} from "@/components/motion-primitives/text-effect";
+import {AnimatedGroup} from "@/components/motion-primitives/animated-group";
+import DecryptedText from "@/components/DecryptedText";
+import {transitionVariants} from "@/lib/utils";
+import EeyAayLanyard from "@/components/eeyaay-lanyard";
+
+export default function HeroSection() {
+    return (
+        <main className="overflow-x-hidden">
+            <section className='lg:h-screen' id="about">
+                <div
+                    className="pb-24 pt-12 md:pb-32 lg:pb-56 lg:pt-44 lg:grid lg:grid-cols-2 lg:grid-rows-1 grid-cols-1 grid-rows-2">
+                    <div className="relative mx-auto flex max-w-xl flex-col px-6 lg:block">
+                        <div className="mx-auto max-w-2xl text-center lg:ml-0 lg:text-left">
+                            <div className='mt-8 lg:mt-16'>
+                                <DecryptedText
+                                    text="AI & Automation Partner for Modern Business"
+                                    animateOn="view"
+                                    revealDirection="start"
+                                    sequential
+                                    useOriginalCharsOnly={false}
+                                    speed={70}
+                                    className='font-mono text-muted-foreground bg-black rounded-md uppercase'
+                                />
+                            </div>
+                            <TextEffect
+                                preset="fade-in-blur"
+                                speedSegment={0.3}
+                                as="h1"
+                                className="max-w-2xl text-balance text-6xl font-semibold md:text-7xl xl:text-8xl">
+                                Automate.
+                            </TextEffect>
+                            <TextEffect
+                                preset="fade-in-blur"
+                                speedSegment={0.3}
+                                as="h1"
+                                className="max-w-2xl text-balance text-6xl font-semibold md:text-7xl xl:text-8xl">
+                                Scale. Grow.
+                            </TextEffect>
+                            <TextEffect
+                                per="line"
+                                preset="fade-in-blur"
+                                speedSegment={0.3}
+                                delay={0.5}
+                                as="p"
+                                className="mt-8 max-w-2xl text-pretty text-lg text-muted-foreground bg-black p-1 rounded-md">
+                                We help companies automate workflows, deploy AI assistants, improve customer
+                                experience, and build scalable digital systems that drive real business growth.
+                            </TextEffect>
+                            <AnimatedGroup
+                                variants={{
+                                    container: {
+                                        visible: {
+                                            transition: {
+                                                staggerChildren: 0.05,
+                                                delayChildren: 0.75,
+                                            },
+                                        },
+                                    },
+                                    ...transitionVariants,
+                                }}
+                                className="mt-12 flex flex-col items-center justify-center gap-2 sm:flex-row lg:justify-start"
+                            >
+                                <Button
+                                    asChild
+                                    size="lg"
+                                    className="px-5 text-base">
+                                    <Link href="#contact">
+                                        <span className="text-nowrap">Get Started</span>
+                                    </Link>
+                                </Button>
+                                <Button
+                                    key={2}
+                                    asChild
+                                    size="lg"
+                                    variant="ghost"
+                                    className="px-5 text-base bg-black/30 backdrop-blur-sm hover:bg-black/40">
+                                    <Link href="#services">
+                                        <span className="text-nowrap">Our Services</span>
+                                    </Link>
+                                </Button>
+                            </AnimatedGroup>
+                        </div>
+                    </div>
+                    <EeyAayLanyard
+                        position={[0, 0, 20]}
+                        containerClassName='lg:absolute lg:top-0 lg:right-0 lg:w-1/2 relative w-full h-screen bg-radial lg:from-transparent lg:to-transparent from-muted to-background select-none'
+                    />
+                </div>
+            </section>
+        </main>
+    )
+}

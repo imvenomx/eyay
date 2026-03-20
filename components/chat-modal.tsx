@@ -24,12 +24,11 @@ export default function ChatModal({open, onClose}: ChatModalProps) {
 
     useEffect(() => {
         if (open) {
-            document.body.style.overflow = 'hidden'
+            document.documentElement.classList.add('no-scroll')
         } else {
-            document.body.style.overflowY = 'auto'
-            document.body.style.overflowX = 'hidden'
+            document.documentElement.classList.remove('no-scroll')
         }
-        return () => { document.body.style.overflowY = 'auto'; document.body.style.overflowX = 'hidden' }
+        return () => { document.documentElement.classList.remove('no-scroll') }
     }, [open])
 
     const handleSend = () => {

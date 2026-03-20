@@ -62,19 +62,38 @@ export default function SplashScreen() {
     useEffect(() => {
         if (sessionStorage.getItem('ey-entered')) {
             setVisible(false)
+            // Resume audio on page navigation (user already clicked enter before)
+            if (!(window as any).__eyAudio) {
+                try {
+                    const audio = new Audio('/ambient.mp3')
+                    audio.loop = true
+                    audio.volume = 0.1
+                    audio.play().catch(() => {}) // may fail without user gesture
+                    ;(window as any).__eyAudio = audio
+                } catch {}
+            }
             return
         }
-        // Disable scroll until entered
-        document.body.style.overflow = 'hidden'
-        return () => { document.body.style.overflowY = 'auto'; document.body.style.overflowX = 'hidden' }
+        // Disable scroll until entered — use a class to avoid inline style conflicts
+        document.documentElement.classList.add('no-scroll')
+        return () => { document.documentElement.classList.remove('no-scroll') }
     }, [])
 
     const handleEnter = useCallback(async () => {
         if (entered) return
         setEntered(true)
         sessionStorage.setItem('ey-entered', '1')
-        document.body.style.overflowY = 'auto'
-        document.body.style.overflowX = 'hidden'
+        document.documentElement.classList.remove('no-scroll')
+
+        // Start ambient audio
+        try {
+            const audio = new Audio('/ambient.mp3')
+            audio.loop = true
+            audio.volume = 0.1
+            audio.play()
+            // Store globally so it persists across the session
+            ;(window as any).__eyAudio = audio
+        } catch {}
 
         try {
             const gsap = (await import('gsap')).default

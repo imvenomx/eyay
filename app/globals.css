@@ -158,12 +158,16 @@
   }
   body {
     @apply bg-background text-foreground;
-    overflow-x: clip;
   }
   html {
     scroll-behavior: smooth;
-    overflow-x: clip;
   }
+}
+
+/* Lock scroll without breaking sticky */
+html.no-scroll {
+  overflow: hidden !important;
+  height: 100vh !important;
 }
 
 /* Smooth section transitions */

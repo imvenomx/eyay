@@ -34,9 +34,9 @@ export default function TransitionOverlay() {
                 const gsap = (await import('gsap')).default
                 window.scrollTo(0, 0)
                 gsap.timeline({onComplete: () => { isAnimating.current = false }})
-                    .to(text, {opacity: 0, duration: 0.2}, '+=0.15')
-                    .to(top, {yPercent: -100, duration: 0.5, ease: 'power3.inOut'})
-                    .to(bottom, {yPercent: 100, duration: 0.5, ease: 'power3.inOut'}, '<')
+                    .to(text, {opacity: 0, duration: 0.25}, '+=0.4')
+                    .to(top, {yPercent: -100, duration: 0.6, ease: 'power3.inOut'})
+                    .to(bottom, {yPercent: 100, duration: 0.6, ease: 'power3.inOut'}, '<')
                     .set([top, bottom, text], {display: 'none'})
             } catch { isAnimating.current = false }
         }, 100)
@@ -79,9 +79,9 @@ export default function TransitionOverlay() {
                         .set(top, {yPercent: -100})
                         .set(bottom, {yPercent: 100})
                         .set(text, {opacity: 0})
-                        .to(top, {yPercent: 0, duration: 0.4, ease: 'power3.inOut'})
-                        .to(bottom, {yPercent: 0, duration: 0.4, ease: 'power3.inOut'}, '<')
-                        .to(text, {opacity: 1, duration: 0.2}, '-=0.1')
+                        .to(top, {yPercent: 0, duration: 0.6, ease: 'power3.inOut'})
+                        .to(bottom, {yPercent: 0, duration: 0.6, ease: 'power3.inOut'}, '<')
+                        .to(text, {opacity: 1, duration: 0.3}, '-=0.15')
                 })
 
                 // Navigate using Next.js router (no full reload = no error flash)

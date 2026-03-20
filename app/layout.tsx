@@ -10,6 +10,7 @@ import TransitionOverlay from "@/components/transition-layout";
 import {LanguageProvider} from "@/lib/language-context";
 import SplashScreen from "@/components/splash-screen";
 import AudioPlayer from "@/components/audio-player";
+import ErrorSuppressor from "@/components/error-suppressor";
 
 const _geist = Geist({subsets: ["latin"]});
 const _geistMono = Geist_Mono({subsets: ["latin"]});
@@ -50,6 +51,7 @@ export default function RootLayout({children}: Readonly<{ children: React.ReactN
         </head>
         <body className="font-sans antialiased bg-black">
         <LanguageProvider>
+            <ErrorSuppressor/>
             <SplashScreen/>
             <AudioPlayer/>
             <CustomCursor/>

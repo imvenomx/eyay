@@ -1,16 +1,12 @@
 import React from "react"
 import type {Metadata} from 'next'
 import {Geist, Geist_Mono} from 'next/font/google'
-import Script from 'next/script'
 import './globals.css'
-import FooterSection from "@/components/footer";
-import {HeroHeader} from "@/components/header";
-import CustomCursor from "@/components/custom-cursor";
-import TransitionOverlay from "@/components/transition-layout";
 import {LanguageProvider} from "@/lib/language-context";
-import SplashScreen from "@/components/splash-screen";
-import AudioPlayer from "@/components/audio-player";
-import ErrorSuppressor from "@/components/error-suppressor";
+import SiteChrome from "@/components/site-chrome";
+import JsonLd from "@/components/json-ld";
+import {organizationSchema, websiteSchema, localBusinessSchema} from "@/lib/schemas";
+import {SITE_URL, siteOgImage} from "@/lib/site";
 
 const _geist = Geist({subsets: ["latin"]});
 const _geistMono = Geist_Mono({subsets: ["latin"]});
@@ -32,34 +28,45 @@ export const metadata: Metadata = {
         siteName: 'Eey Aay',
         title: 'Eey Aay — Soluzioni AI & Automazione per Aziende Moderne',
         description: 'Aiutiamo le aziende ad automatizzare i workflow, implementare assistenti AI, migliorare l\'esperienza cliente e costruire sistemi digitali scalabili.',
-        images: [{url: 'https://www.eeyaay.it/ogimg.png', width: 1200, height: 630, alt: 'Eey Aay — AI & Automazione'}],
+        images: [{url: siteOgImage({title: 'Eey Aay', subtitle: 'AI & Automazione per il Business Moderno', eyebrow: 'Eey Aay // Italia'}), width: 1200, height: 630, alt: 'Eey Aay — AI & Automazione'}],
     },
     twitter: {
         card: 'summary_large_image',
         title: 'Eey Aay — Soluzioni AI & Automazione',
         description: 'Aiutiamo le aziende ad automatizzare le operazioni e costruire sistemi AI che scalano.',
-        images: ['https://www.eeyaay.it/ogimg.png'],
+        images: [siteOgImage({title: 'Eey Aay', subtitle: 'AI & Automazione per il Business Moderno', eyebrow: 'Eey Aay // Italia'})],
     },
     robots: {index: true, follow: true},
     icons: {icon: [{url: '/favicon.svg', type: 'image/svg+xml'}]},
+    manifest: '/manifest.webmanifest',
+    appleWebApp: {
+        capable: true,
+        title: 'Eey Aay',
+        statusBarStyle: 'black-translucent',
+    },
+    alternates: {
+        canonical: SITE_URL,
+        // Same-URL multilingual: the IT/EN toggle is a client-side preference,
+        // not a separate URL. Both hreflang values point to the same canonical.
+        languages: {
+            'it-IT': SITE_URL,
+            'en-US': SITE_URL,
+            'x-default': SITE_URL,
+        },
+    },
 }
 
 export default function RootLayout({children}: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="it" className="dark" suppressHydrationWarning>
         <head>
-            <ErrorSuppressor/>
-            <Script src="https://unpkg.com/@splinetool/viewer@1.9.48/build/spline-viewer.js" strategy="lazyOnload" type="module"/>
+            <JsonLd data={organizationSchema()}/>
+            <JsonLd data={websiteSchema()}/>
+            <JsonLd data={localBusinessSchema()}/>
         </head>
         <body className="font-sans antialiased bg-black" suppressHydrationWarning>
         <LanguageProvider>
-            <SplashScreen/>
-            <AudioPlayer/>
-            <CustomCursor/>
-            <TransitionOverlay/>
-            <HeroHeader/>
-            {children}
-            <FooterSection/>
+            <SiteChrome>{children}</SiteChrome>
         </LanguageProvider>
         </body>
         </html>

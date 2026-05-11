@@ -1,6 +1,10 @@
 'use client'
 import React, {useEffect, useRef} from 'react'
+import dynamic from 'next/dynamic'
 import {TextEffect} from "@/components/motion-primitives/text-effect";
+
+// react-spline is heavy + WebGL — dynamic-load on the client only.
+const Spline = dynamic(() => import('@splinetool/react-spline'), {ssr: false})
 
 export default function SplineRobotSection() {
     const sectionRef = useRef<HTMLElement>(null)
@@ -86,11 +90,7 @@ export default function SplineRobotSection() {
 
                     {/* Robot side */}
                     <div className="robot-container relative h-[500px] md:h-[600px]">
-                        {/* @ts-ignore */}
-                        <spline-viewer
-                            url="https://prod.spline.design/fP0LH65i8bXQDQjZ/scene.splinecode"
-                            style={{width: '100%', height: '100%'}}
-                        />
+                        <Spline scene="https://prod.spline.design/fP0LH65i8bXQDQjZ/scene.splinecode" style={{width: '100%', height: '100%'}}/>
                         {/* Gradient overlay to blend edges */}
                         <div
                             className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black via-transparent to-transparent"/>

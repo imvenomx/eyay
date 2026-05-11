@@ -44,7 +44,7 @@ export const serviceColumns: NavColumn[] = [
 // Primary nav (header + footer)
 export const pageLinks: NavItem[] = [
     {label: 'Chi Siamo', href: '/about'},
-    {label: 'Servizi', href: '/#services'},
+    {label: 'Servizi', href: '/services'},
     {label: 'Case Studies', href: '/case-studies'},
     {label: 'Blog', href: '/blog'},
     {label: 'Contatti', href: '/contact'},

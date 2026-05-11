@@ -26,7 +26,7 @@ export default function CallToAction() {
                         <Link href="/contact" data-magnetic className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-black text-white text-xs tracking-wider hover:bg-black/80 transition-all duration-300 font-vcr-mono">
                             <BinaryHover>{t('cta.button')}</BinaryHover>
                         </Link>
-                        <Link href="/#services" data-magnetic className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full border border-black/15 text-xs tracking-wider hover:bg-black hover:text-white transition-all duration-300 font-vcr-mono">
+                        <Link href="/services" data-magnetic className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full border border-black/15 text-xs tracking-wider hover:bg-black hover:text-white transition-all duration-300 font-vcr-mono">
                             <BinaryHover>{t('cta.services')}</BinaryHover>
                         </Link>
                     </div>

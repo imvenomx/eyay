@@ -86,7 +86,7 @@ export default function ServicePage({data}: { data: ServicePageData }) {
                     <div className="flex items-center gap-2 text-xs font-mono text-black/40 uppercase tracking-wider mb-8">
                         <Link href="/" className="hover:text-black transition-colors">Home</Link>
                         <span>/</span>
-                        <Link href="/#services" className="hover:text-black transition-colors">Servizi</Link>
+                        <Link href="/services" className="hover:text-black transition-colors">Servizi</Link>
                         <span>/</span>
                         <span className="text-black/70">{data.breadcrumb}</span>
                     </div>

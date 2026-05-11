@@ -1,5 +1,5 @@
 'use client'
-import {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
 
 interface BinaryHoverProps {
     children: string
@@ -14,6 +14,7 @@ export default function BinaryHover({
                                         as: Tag = 'span',
                                         ...props
                                     }: BinaryHoverProps) {
+    const Component = Tag as any
     const [display, setDisplay] = useState(children)
     const [hovering, setHovering] = useState(false)
 
@@ -56,14 +57,17 @@ export default function BinaryHover({
     const enter = useCallback(() => setHovering(true), [])
     const leave = useCallback(() => setHovering(false), [])
 
+    const isScrambling = hovering && display !== children
+
     return (
-        <Tag
+        <Component
             className={`font-mono transition-none ${className}`}
             onMouseEnter={enter}
             onMouseLeave={leave}
+            aria-label={isScrambling ? children : undefined}
             {...props}
         >
-            {display}
-        </Tag>
+            <span aria-hidden={isScrambling || undefined}>{display}</span>
+        </Component>
     )
 }

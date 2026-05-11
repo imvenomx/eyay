@@ -139,7 +139,8 @@ function FinalObject({scrollProgress}: { scrollProgress: React.MutableRefObject<
         // Appear in the last 20% of scroll
         const appear = Math.max(0, (p - 0.8) / 0.2)
         ref.current.position.y = -5 + appear * 5
-        ref.current.material.opacity = appear
+        const mat = ref.current.material as THREE.Material
+        mat.opacity = appear
         ref.current.rotation.y = clock.getElapsedTime() * 0.3
         ref.current.rotation.x = clock.getElapsedTime() * 0.15
     })

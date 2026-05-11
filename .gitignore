@@ -2,6 +2,18 @@ node_modules/
 .next/
 .env
 .env.local
+.env*.local
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# Local file-store data (use Supabase in production)
+data/*.json
+
+# Playwright / test outputs
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Bundle analyzer reports
+.next/analyze/

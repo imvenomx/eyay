@@ -133,6 +133,10 @@ async function callOpenRouter(apiKey: string, model: string, prompt: string): Pr
             model,
             messages: [{role: 'user', content: prompt}],
             modalities: ['image', 'text'],
+            // Cap explicitly. Without this OpenRouter reserves the model's full
+            // context (~65k tokens / ~$0.98 each), which trips the weekly
+            // per-key cap after ~30 requests even though actual usage is tiny.
+            max_tokens: 8192,
         }),
     })
     const text = await res.text()

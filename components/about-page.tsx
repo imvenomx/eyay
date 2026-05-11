@@ -71,7 +71,7 @@ export default function AboutPage() {
                 {/* CTA */}
                 <div className="px-6 md:px-12 lg:px-16 py-20 md:py-28 text-center">
                     <h3 className="text-3xl md:text-4xl font-vcr mb-8" style={{fontWeight: 500}}>{t('cta.heading')}</h3>
-                    <Link href="/contact" className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-black text-white text-xs tracking-wider hover:bg-black/80 transition-all duration-300 font-vcr-mono">
+                    <Link href="/contact" data-magnetic className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-black text-white text-xs tracking-wider hover:bg-black/80 transition-all duration-300 font-vcr-mono">
                         <BinaryHover>{t('cta.button')}</BinaryHover>
                     </Link>
                 </div>

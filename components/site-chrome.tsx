@@ -5,7 +5,6 @@ import FooterSection from '@/components/footer'
 import {HeroHeader} from '@/components/header'
 import CustomCursor from '@/components/custom-cursor'
 import TransitionOverlay from '@/components/transition-layout'
-import SplashScreen from '@/components/splash-screen'
 import ScrollToTop from '@/components/scroll-to-top'
 import CookieBanner from '@/components/cookie-banner'
 import FaviconController from '@/components/favicon-controller'
@@ -20,7 +19,6 @@ export default function SiteChrome({children}: {children: React.ReactNode}) {
 
     return (
         <>
-            <SplashScreen/>
             <CustomCursor/>
             <TransitionOverlay/>
             <HeroHeader/>

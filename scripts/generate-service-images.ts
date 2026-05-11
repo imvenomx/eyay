@@ -198,14 +198,31 @@ async function main() {
             console.log(`\n[${service.slug} #${i + 1}] ${blocks[i].title}`)
             console.log(prompt.split('\n').map(l => '    ' + l).join('\n'))
             if (args.dryRun) continue
-            try {
-                const pngBuf = await callOpenRouter(apiKey!, args.model, prompt)
-                const webpBuf = await sharp(pngBuf).webp({quality: 88, effort: 6}).toBuffer()
-                await fs.writeFile(outPath, webpBuf)
-                console.log(`  ok     ${outPath} (${(webpBuf.length / 1024).toFixed(1)} KB, from ${(pngBuf.length / 1024).toFixed(0)} KB PNG)`)
-                generated++
-            } catch (e) {
-                console.error(`  FAIL   ${service.slug}-${i + 1}: ${e instanceof Error ? e.message : 'unknown error'}`)
+            const MAX_ATTEMPTS = 3
+            let lastError: string | null = null
+            let success = false
+            for (let attempt = 1; attempt <= MAX_ATTEMPTS && !success; attempt++) {
+                try {
+                    const pngBuf = await callOpenRouter(apiKey!, args.model, prompt)
+                    const webpBuf = await sharp(pngBuf).webp({quality: 88, effort: 6}).toBuffer()
+                    await fs.writeFile(outPath, webpBuf)
+                    console.log(`  ok     ${outPath} (${(webpBuf.length / 1024).toFixed(1)} KB)${attempt > 1 ? ` [attempt ${attempt}]` : ''}`)
+                    generated++
+                    success = true
+                } catch (e) {
+                    lastError = e instanceof Error ? e.message : 'unknown error'
+                    const transient = /fetch failed|Network connection lost|terminated|no image|ETIMEDOUT|ECONNRESET|5\d\d/i.test(lastError)
+                    if (attempt < MAX_ATTEMPTS && transient) {
+                        const backoffMs = attempt * 2000
+                        console.log(`  retry  ${service.slug}-${i + 1} in ${backoffMs}ms (${attempt}/${MAX_ATTEMPTS}): ${lastError.slice(0, 80)}`)
+                        await new Promise(r => setTimeout(r, backoffMs))
+                    } else {
+                        break
+                    }
+                }
+            }
+            if (!success) {
+                console.error(`  FAIL   ${service.slug}-${i + 1}: ${lastError}`)
                 failed++
             }
         }

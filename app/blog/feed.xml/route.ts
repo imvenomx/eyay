@@ -26,7 +26,7 @@ function postToItem(post: PostRecord): string {
             <pubDate>${rfc822(post.publishedAt)}</pubDate>
             <description>${escapeXml(post.excerpt)}</description>
             <category>${escapeXml(post.category)}</category>
-            <author>hello@eeyaay.com (${escapeXml(post.author)})</author>
+            <author>support@eeyaay.it (${escapeXml(post.author)})</author>
         </item>`
 }
 

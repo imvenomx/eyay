@@ -77,7 +77,7 @@ export default function ContactPage() {
                         <div className="space-y-6 border-t border-black/10 pt-8">
                             <h3 className="text-lg font-vcr">{t('contact.info')}</h3>
                             <div className="space-y-3 text-sm text-black/50">
-                                <p>hello@eeyaay.com</p>
+                                <p>support@eeyaay.it</p>
                             </div>
                         </div>
                     </div>

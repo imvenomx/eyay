@@ -42,14 +42,19 @@ export default function FooterSection() {
         }
     }, [email, newsletterStatus])
 
+    const spotlightRaf = useRef<number | null>(null)
     const handleMouseMove = useCallback((e: React.MouseEvent) => {
         if (!spotlightRef.current || !footerRef.current) return
         const rect = footerRef.current.getBoundingClientRect()
         const x = e.clientX - rect.left
         const y = e.clientY - rect.top
-        spotlightRef.current.style.left = x + 'px'
-        spotlightRef.current.style.top = y + 'px'
-        spotlightRef.current.style.opacity = '1'
+        if (spotlightRaf.current) return
+        spotlightRaf.current = requestAnimationFrame(() => {
+            spotlightRaf.current = null
+            if (!spotlightRef.current) return
+            spotlightRef.current.style.transform = `translate3d(${x - 200}px, ${y - 200}px, 0)`
+            spotlightRef.current.style.opacity = '1'
+        })
     }, [])
 
     const handleMouseLeave = useCallback(() => {
@@ -58,11 +63,18 @@ export default function FooterSection() {
 
     return (
         <footer ref={footerRef} className="bg-black text-white relative overflow-hidden" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
-            {/* Spotlight circle — white with mix-blend-difference inverts colors */}
+            {/* Subtle spotlight that follows the cursor (no mix-blend — keeps paints cheap) */}
             <div
                 ref={spotlightRef}
-                className="absolute w-[350px] h-[350px] rounded-full bg-white pointer-events-none mix-blend-difference transition-opacity duration-300"
-                style={{transform: 'translate(-50%, -50%)', opacity: 0, top: '-100px', left: '-100px'}}
+                className="absolute w-[400px] h-[400px] rounded-full pointer-events-none transition-opacity duration-300"
+                style={{
+                    top: 0,
+                    left: 0,
+                    opacity: 0,
+                    transform: 'translate3d(-1000px, -1000px, 0)',
+                    background: 'radial-gradient(closest-side, rgba(255,255,255,0.10), rgba(255,255,255,0))',
+                    willChange: 'transform, opacity',
+                }}
             />
             {/* Top section: CTA + Newsletter */}
             <div className="w-full px-8 md:px-16 lg:px-20 border-t border-white/10">
@@ -70,8 +82,11 @@ export default function FooterSection() {
                     {/* Left: CTA */}
                     <div className="flex items-start">
                         <span className="inline-block w-2 h-2 rounded-full bg-white mr-3 mt-3"/>
-                        <Link href="#contact" className="text-3xl md:text-4xl font-vcr hover:opacity-70 transition-opacity">
-                            Iniziamo qualcosa &rarr;
+                        <Link
+                            href="/contact"
+                            data-magnetic
+                            className="text-3xl md:text-4xl font-vcr text-white hover:opacity-70 transition-opacity">
+                            {t('footer.cta')} &rarr;
                         </Link>
                     </div>
 
@@ -149,7 +164,7 @@ export default function FooterSection() {
                             ))}
                         </div>
                         <div className="space-y-2 text-xs text-white/40">
-                            <p>hello@eeyaay.com</p>
+                            <p>support@eeyaay.it</p>
                         </div>
                     </div>
                 </div>

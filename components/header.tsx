@@ -7,7 +7,6 @@ import React, {useEffect, useState} from 'react'
 import BinaryHover from '@/components/binary-hover'
 import {useLanguage} from '@/lib/language-context'
 import ChatModal from '@/components/chat-modal'
-import AnimatedLogo from '@/components/animated-logo'
 import {SOCIAL_LINKS} from '@/lib/social-links'
 import {serviceColumns, pageLinks} from '@/lib/navigation'
 
@@ -97,8 +96,15 @@ export const HeroHeader = () => {
             <nav className={`fixed z-50 w-full border-b transition-colors duration-300 ${navClasses}`}>
                 <div className="mx-auto max-w-6xl px-6">
                     <div className="flex items-center justify-between py-3 lg:py-4">
-                        <Link href="/" aria-label="home" className={`block ${textColor} transition-colors duration-300`}>
-                            <AnimatedLogo/>
+                        <Link href="/" aria-label="home" className="block relative w-[100px] h-[28px]">
+                            <Image
+                                src={lightNav ? '/eylogo-black.png' : '/eylogo.png'}
+                                alt="Eey Aay"
+                                fill
+                                className="object-contain transition-opacity duration-300"
+                                sizes="100px"
+                                priority
+                            />
                         </Link>
 
                         {/* Center — search pill (opens chat) */}

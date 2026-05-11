@@ -162,7 +162,7 @@ export default function ChatModal({open, onClose}: ChatModalProps) {
                                 <span className="absolute bottom-0 right-0 w-px h-2.5 bg-black/30"/>
                                 Apri form →
                             </Link>
-                            <a href="mailto:hello@eeyaay.com"
+                            <a href="mailto:support@eeyaay.it"
                                className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/15 hover:border-white/40 font-vcr text-xs uppercase tracking-[0.2em] text-white/70 hover:text-white transition-colors">
                                 Email
                             </a>

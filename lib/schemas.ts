@@ -10,7 +10,7 @@ export function organizationSchema() {
         url: SITE_URL,
         logo: absoluteUrl('/eylogo.png'),
         description: SITE_DESCRIPTION,
-        email: 'hello@eeyaay.com',
+        email: 'support@eeyaay.it',
         sameAs: SOCIAL_LINKS.map(s => s.href),
     }
 }
@@ -25,7 +25,7 @@ export function localBusinessSchema() {
         image: absoluteUrl(siteOgImage({title: SITE_NAME, subtitle: 'AI & Automazione per il Business Moderno'})),
         logo: absoluteUrl('/eylogo.png'),
         description: SITE_DESCRIPTION,
-        email: 'hello@eeyaay.com',
+        email: 'support@eeyaay.it',
         priceRange: '€€',
         areaServed: {'@type': 'Country', name: 'Italy'},
         address: {

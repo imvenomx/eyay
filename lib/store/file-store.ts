@@ -37,7 +37,7 @@ I post saranno **brevi, concreti e azionabili**. Niente fuffa, niente "intellige
 
 ## Vuoi suggerire un argomento?
 
-Scrivici e ti rispondiamo: hello@eeyaay.com`,
+Scrivici e ti rispondiamo: support@eeyaay.it`,
     category: 'ai',
     author: 'Eey Aay',
     coverImage: null,

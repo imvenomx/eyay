@@ -1,50 +1,15 @@
 'use client'
 import Link from 'next/link'
 import Image from 'next/image'
+import {usePathname} from 'next/navigation'
 import {Menu, X} from 'lucide-react'
 import React, {useEffect, useState} from 'react'
 import BinaryHover from '@/components/binary-hover'
 import {useLanguage} from '@/lib/language-context'
 import ChatModal from '@/components/chat-modal'
-
-const serviceColumns = [
-    {
-        title: 'Soluzioni AI',
-        items: [
-            {label: 'CHATBOT AI', href: '/service/ai-chatbots'},
-            {label: 'AGENTI VOCALI AI', href: '/service/ai-voice-agents'},
-            {label: 'AI BASATA SULLA CONOSCENZA', href: '/service/rag-knowledge-ai'},
-            {label: 'GPT PERSONALIZZATI', href: '/service/custom-gpts'},
-            {label: 'AI WHITE-LABEL', href: '/service/white-label-ai'},
-        ],
-    },
-    {
-        title: 'Automazione',
-        items: [
-            {label: 'AUTOMAZIONE RPA', href: '/service/rpa-automation'},
-            {label: 'INTEGRAZIONE CRM / ERP', href: '/service/crm-erp-integration'},
-            {label: 'CONFIGURAZIONE GOHIGHLEVEL', href: '/service/gohighlevel'},
-            {label: 'AUTOMAZIONE EMAIL', href: '/service/email-automation'},
-        ],
-    },
-    {
-        title: 'Crescita & Dati',
-        items: [
-            {label: 'SVILUPPO WEB', href: '/service/web-development'},
-            {label: 'SEO & SEO LOCALE', href: '/service/seo'},
-            {label: 'E-COMMERCE', href: '/service/ecommerce'},
-            {label: 'BI & MACHINE LEARNING', href: '/service/bi-machine-learning'},
-            {label: 'FORMAZIONE AI', href: '/service/ai-training'},
-        ],
-    },
-]
-
-const pageLinks = [
-    {label: 'Chi Siamo', href: '/about'},
-    {label: 'Servizi', href: '/#services'},
-    {label: 'Processo', href: '/#process'},
-    {label: 'Contatti', href: '/contact'},
-]
+import AnimatedLogo from '@/components/animated-logo'
+import {SOCIAL_LINKS} from '@/lib/social-links'
+import {serviceColumns, pageLinks} from '@/lib/navigation'
 
 function LangSwitch({lightNav}: { lightNav: boolean }) {
     const {lang, setLang} = useLanguage()
@@ -54,10 +19,12 @@ function LangSwitch({lightNav}: { lightNav: boolean }) {
     return (
         <button
             onClick={() => setLang(lang === 'it' ? 'en' : 'it')}
+            aria-label={lang === 'it' ? 'Cambia lingua a inglese' : 'Switch language to Italian'}
+            aria-pressed={false}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full border ${borderColor} text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer`}>
-            <span className={lang === 'it' ? textColor : mutedColor}>IT</span>
-            <span className={mutedColor}>/</span>
-            <span className={lang === 'en' ? textColor : mutedColor}>EN</span>
+            <span className={lang === 'it' ? textColor : mutedColor} aria-hidden="true">IT</span>
+            <span className={mutedColor} aria-hidden="true">/</span>
+            <span className={lang === 'en' ? textColor : mutedColor} aria-hidden="true">EN</span>
         </button>
     )
 }
@@ -66,6 +33,13 @@ export const HeroHeader = () => {
     const [menuOpen, setMenuOpen] = React.useState(false)
     const [chatOpen, setChatOpen] = React.useState(false)
     const [lightNav, setLightNav] = useState(false)
+    const pathname = usePathname() || '/'
+    const isActive = (href: string) => {
+        // For hash links (e.g. /#services) match only when on homepage
+        if (href.startsWith('/#')) return pathname === '/'
+        if (href === '/') return pathname === '/'
+        return pathname === href || pathname.startsWith(`${href}/`)
+    }
 
     // Observe white/light sections to toggle nav theme
     useEffect(() => {
@@ -123,15 +97,8 @@ export const HeroHeader = () => {
             <nav className={`fixed z-50 w-full border-b transition-colors duration-300 ${navClasses}`}>
                 <div className="mx-auto max-w-6xl px-6">
                     <div className="flex items-center justify-between py-3 lg:py-4">
-                        <Link href="/" aria-label="home" className="block relative w-[100px] h-[28px]">
-                            <Image
-                                src={lightNav ? '/eylogo-black.png' : '/eylogo.png'}
-                                alt="Eey Aay"
-                                fill
-                                className="object-contain transition-opacity duration-300"
-                                sizes="100px"
-                                priority
-                            />
+                        <Link href="/" aria-label="home" className={`block ${textColor} transition-colors duration-300`}>
+                            <AnimatedLogo/>
                         </Link>
 
                         {/* Center — search pill (opens chat) */}
@@ -195,7 +162,7 @@ export const HeroHeader = () => {
                                             <Link href={item.href} onClick={() => setMenuOpen(false)}
                                                   className="group flex items-center gap-2 text-white/50 hover:text-white transition-colors duration-200">
                                                 <span className="size-1.5 rounded-full bg-white/30 group-hover:bg-white transition-colors"/>
-                                                <BinaryHover className="text-xs tracking-wider">{item.label}</BinaryHover>
+                                                <BinaryHover className="text-xs tracking-wider uppercase">{item.label}</BinaryHover>
                                             </Link>
                                         </li>
                                     ))}
@@ -204,12 +171,19 @@ export const HeroHeader = () => {
                         ))}
                         <div>
                             <div className="space-y-4">
-                                {pageLinks.map((link) => (
-                                    <Link key={link.label} href={link.href} onClick={() => setMenuOpen(false)}
-                                          className="block text-white/80 hover:text-white text-lg transition-colors duration-200">
-                                        <BinaryHover>{link.label}</BinaryHover>
-                                    </Link>
-                                ))}
+                                {pageLinks.map((link) => {
+                                    const active = isActive(link.href)
+                                    return (
+                                        <Link key={link.label} href={link.href} onClick={() => setMenuOpen(false)}
+                                              aria-current={active ? 'page' : undefined}
+                                              className={`flex items-center gap-3 text-lg transition-colors duration-200 ${
+                                                  active ? 'text-white' : 'text-white/80 hover:text-white'
+                                              }`}>
+                                            <span aria-hidden="true" className={`size-1.5 rounded-full transition-colors ${active ? 'bg-white' : 'bg-white/0'}`}/>
+                                            <BinaryHover>{link.label}</BinaryHover>
+                                        </Link>
+                                    )
+                                })}
                             </div>
                             <div className="mt-8">
                                 <Link href="#contact" onClick={() => setMenuOpen(false)}
@@ -222,11 +196,15 @@ export const HeroHeader = () => {
                     </div>
 
                     <div className="border-t border-white/10 pt-6 flex flex-wrap gap-3">
-                        {['LinkedIn', 'Twitter', 'Instagram'].map((social) => (
-                            <span key={social}
-                                  className="px-3 py-1.5 rounded-full border border-white/10 text-xs font-mono uppercase tracking-wider text-white/50 hover:text-white hover:border-white/30 transition-colors cursor-pointer">
-                                <BinaryHover>{social}</BinaryHover>
-                            </span>
+                        {SOCIAL_LINKS.map((social) => (
+                            <a key={social.label}
+                               href={social.href}
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               aria-label={`Eey Aay su ${social.label}`}
+                               className="px-3 py-1.5 rounded-full border border-white/10 text-xs font-mono uppercase tracking-wider text-white/50 hover:text-white hover:border-white/30 transition-colors">
+                                <BinaryHover>{social.label}</BinaryHover>
+                            </a>
                         ))}
                     </div>
                 </div>

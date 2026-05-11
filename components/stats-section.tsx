@@ -1,15 +1,9 @@
 'use client'
 import React, {useEffect, useRef, useState} from 'react'
 import {useLanguage} from '@/lib/language-context'
+import {SITE_STATS, type SiteStat} from '@/lib/site-stats'
 
-const stats = [
-    {value: 150, suffix: '+', labelKey: 'stats.projects'},
-    {value: 50, suffix: '+', labelKey: 'stats.models'},
-    {value: 10, suffix: 'K+', labelKey: 'stats.hours'},
-    {value: 98, suffix: '%', labelKey: 'stats.retention'},
-]
-
-function StatCard({stat, counted}: {stat: typeof stats[0]; counted: string}) {
+function StatCard({stat, counted}: {stat: SiteStat; counted: string}) {
     const {t} = useLanguage()
     const label = t(stat.labelKey)
     const [display, setDisplay] = useState(label)
@@ -29,7 +23,7 @@ function StatCard({stat, counted}: {stat: typeof stats[0]; counted: string}) {
                     <span className="stat-number text-5xl md:text-6xl font-vcr text-black group-hover:text-white transition-colors duration-300" data-count={stat.value}>{counted}</span>
                     <span className="text-2xl md:text-3xl font-vcr text-black/50 group-hover:text-white/50 transition-colors duration-300">{stat.suffix}</span>
                 </div>
-                <p className="text-xs text-black/40 group-hover:text-white/50 font-vcr-mono uppercase tracking-wider transition-colors duration-300">{display}</p>
+                <p className="text-xs text-black/55 group-hover:text-white/65 font-vcr-mono uppercase tracking-wider transition-colors duration-300">{display}</p>
             </div>
         </div>
     )
@@ -38,7 +32,7 @@ function StatCard({stat, counted}: {stat: typeof stats[0]; counted: string}) {
 export default function StatsSection() {
     const sectionRef = useRef<HTMLElement>(null)
     const {lang} = useLanguage()
-    const [counted, setCounted] = useState<string[]>(stats.map(() => '0'))
+    const [counted, setCounted] = useState<string[]>(SITE_STATS.map(() => '0'))
 
     useEffect(() => {
         if (typeof window === 'undefined') return
@@ -48,7 +42,7 @@ export default function StatsSection() {
             gsap.registerPlugin(ScrollTrigger)
             if (!sectionRef.current) return
             gsap.fromTo(sectionRef.current, {filter: 'blur(8px)', opacity: 0}, {filter: 'blur(0px)', opacity: 1, duration: 0.8, scrollTrigger: {trigger: sectionRef.current, start: 'top 85%', toggleActions: 'play none none none'}})
-            stats.forEach((stat, idx) => {
+            SITE_STATS.forEach((stat, idx) => {
                 const obj = {val: 0}
                 ScrollTrigger.create({trigger: sectionRef.current, start: 'top 85%', once: true,
                     onEnter: () => { gsap.to(obj, {val: stat.value, duration: 2, ease: 'power2.out', onUpdate: () => { setCounted(prev => {const n = [...prev]; n[idx] = Math.round(obj.val).toString(); return n}) }}) }})
@@ -72,8 +66,8 @@ export default function StatsSection() {
                     </div>
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-4">
-                    {stats.map((stat, i) => (
-                        <div key={stat.labelKey} className={`${i < stats.length - 1 ? 'md:border-r border-black/15' : ''} ${i >= 2 ? 'border-t lg:border-t-0 border-black/15' : ''}`}>
+                    {SITE_STATS.map((stat, i) => (
+                        <div key={stat.labelKey} className={`${i < SITE_STATS.length - 1 ? 'md:border-r border-black/15' : ''} ${i >= 2 ? 'border-t lg:border-t-0 border-black/15' : ''}`}>
                             <StatCard stat={stat} counted={counted[i]}/>
                         </div>
                     ))}

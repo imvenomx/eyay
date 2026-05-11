@@ -3,6 +3,7 @@ import React, {useState, useCallback, useMemo} from 'react'
 import {useRouter} from 'next/navigation'
 import Link from 'next/link'
 import MarkdownContent from '@/components/markdown-content'
+import SeoPanel from '../seo-panel'
 import {slugify} from '@/lib/slugify'
 import {POST_CATEGORIES, POST_CATEGORY_LABEL, type PostCategory, type PostRecord} from '@/lib/store/types'
 import {formatReadingTime} from '@/lib/reading-time'
@@ -45,7 +46,7 @@ export default function PostForm({mode, initial}: PostFormProps) {
     const router = useRouter()
     const [form, setForm] = useState<FormState>(() => initialState(initial))
     const [errors, setErrors] = useState<FieldErrors>({})
-    const [tab, setTab] = useState<'write' | 'preview'>('write')
+    const [tab, setTab] = useState<'write' | 'preview' | 'seo'>('write')
     const [saving, setSaving] = useState(false)
     const [deleting, setDeleting] = useState(false)
     const [confirmDelete, setConfirmDelete] = useState(false)
@@ -208,9 +209,13 @@ export default function PostForm({mode, initial}: PostFormProps) {
                                         className={`px-3 py-1 text-[10px] font-mono uppercase tracking-wider transition-colors ${tab === 'preview' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}>
                                     Anteprima
                                 </button>
+                                <button type="button" onClick={() => setTab('seo')}
+                                        className={`px-3 py-1 text-[10px] font-mono uppercase tracking-wider transition-colors ${tab === 'seo' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'}`}>
+                                    SEO
+                                </button>
                             </div>
                         </div>
-                        {tab === 'write' ? (
+                        {tab === 'write' && (
                             <textarea
                                 value={form.body}
                                 onChange={e => setField('body', e.target.value)}
@@ -219,7 +224,8 @@ export default function PostForm({mode, initial}: PostFormProps) {
                                 className={`${inputBase} resize-y leading-relaxed ${errors.body ? 'border-red-500/50 focus:border-red-500' : 'border-white/10 focus:border-white/30'}`}
                                 placeholder={'## Titolo sezione\n\nScrivi qui in **markdown**.\n\n- Punto uno\n- Punto due\n\n> Una citazione importante.'}
                             />
-                        ) : (
+                        )}
+                        {tab === 'preview' && (
                             <div className="bg-white text-black p-6 md:p-8 border border-white/10 min-h-[400px] max-h-[700px] overflow-y-auto">
                                 {form.body.trim() ? (
                                     <MarkdownContent source={form.body}/>
@@ -227,6 +233,24 @@ export default function PostForm({mode, initial}: PostFormProps) {
                                     <p className="text-sm text-black/40 font-mono">Inizia a scrivere per vedere l’anteprima…</p>
                                 )}
                             </div>
+                        )}
+                        {tab === 'seo' && (
+                            <SeoPanel
+                                title={form.title}
+                                slug={form.slug}
+                                excerpt={form.excerpt}
+                                body={form.body}
+                                coverImage={form.coverImage}
+                                basePath="/blog"
+                                kind="post"
+                                onApplyFix={(field, value) => {
+                                    if (field === 'slug') {
+                                        setForm(prev => ({...prev, slug: value, slugTouched: true}))
+                                    } else {
+                                        setField(field as 'title' | 'excerpt' | 'body', value)
+                                    }
+                                }}
+                            />
                         )}
                         {errors.body && (
                             <p className="mt-2 text-[10px] font-mono uppercase tracking-wider text-red-400">{errors.body}</p>

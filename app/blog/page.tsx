@@ -125,16 +125,27 @@ function PostCard({post}: {post: PostRecord}) {
     return (
         <Link
             href={`/blog/${post.slug}`}
-            className="group relative bg-white p-7 md:p-8 flex flex-col hover:bg-black/[0.02] transition-colors">
+            className="group relative bg-white flex flex-col hover:bg-black/[0.02] transition-colors overflow-hidden">
             {/* Crosshair corners */}
-            <span className="absolute top-0 left-0 w-3 h-px bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"/>
-            <span className="absolute top-0 left-0 w-px h-3 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"/>
-            <span className="absolute top-0 right-0 w-3 h-px bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"/>
-            <span className="absolute top-0 right-0 w-px h-3 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"/>
-            <span className="absolute bottom-0 left-0 w-3 h-px bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"/>
-            <span className="absolute bottom-0 left-0 w-px h-3 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"/>
-            <span className="absolute bottom-0 right-0 w-3 h-px bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"/>
-            <span className="absolute bottom-0 right-0 w-px h-3 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity"/>
+            <span className="absolute top-0 left-0 w-3 h-px bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity z-10"/>
+            <span className="absolute top-0 left-0 w-px h-3 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity z-10"/>
+            <span className="absolute top-0 right-0 w-3 h-px bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity z-10"/>
+            <span className="absolute top-0 right-0 w-px h-3 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity z-10"/>
+            <span className="absolute bottom-0 left-0 w-3 h-px bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity z-10"/>
+            <span className="absolute bottom-0 left-0 w-px h-3 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity z-10"/>
+            <span className="absolute bottom-0 right-0 w-3 h-px bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity z-10"/>
+            <span className="absolute bottom-0 right-0 w-px h-3 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity z-10"/>
+
+            {post.coverImage && (
+                <div className="aspect-[16/9] w-full bg-black overflow-hidden border-b border-black/10">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={post.coverImage} alt={post.title}
+                         loading="lazy"
+                         className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"/>
+                </div>
+            )}
+
+            <div className="p-7 md:p-8 flex flex-col flex-1">
 
             <div className="flex items-center gap-3 mb-5 text-[10px] font-mono uppercase tracking-[0.2em] text-black/40">
                 <span className="text-black/70">{POST_CATEGORY_LABEL[post.category]}</span>
@@ -155,6 +166,7 @@ function PostCard({post}: {post: PostRecord}) {
                 <span className="font-vcr text-[10px] uppercase tracking-[0.2em] text-black/60 group-hover:text-black transition-colors">
                     Leggi →
                 </span>
+            </div>
             </div>
         </Link>
     )

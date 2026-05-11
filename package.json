@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "start": "next start",
     "gen:images": "tsx --env-file=.env.local scripts/generate-service-images.ts",
+    "seed:blog": "tsx --env-file=.env.local scripts/seed-blog-posts.ts",
     "analyze": "ANALYZE=true next build",
     "test": "vitest run",
     "test:watch": "vitest",

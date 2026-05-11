@@ -2,11 +2,22 @@
 import React, {useState} from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import BinaryHover from '@/components/binary-hover'
+
+import RevealOnView from '@/components/reveal-on-view'
+import ErrorBoundary from '@/components/error-boundary'
+
+const ChatbotDemo = dynamic(() => import('@/components/chatbot-demo'), {ssr: false})
 
 const serviceImages = ['/img1.webp', '/img2.webp', '/img3.webp']
 
-function getImageForBlock(serviceTitle: string, blockIndex: number): string {
+function getImageForBlock(slug: string | undefined, serviceTitle: string, blockIndex: number, generated?: Set<string>): string {
+    // Prefer the per-service generated image if it exists.
+    if (slug && generated?.has(`${slug}-${blockIndex + 1}`)) {
+        return `/services/${slug}-${blockIndex + 1}.webp`
+    }
+    // Fallback: stable hash → one of the 3 shared placeholder images.
     let hash = 0
     for (let i = 0; i < serviceTitle.length; i++) { hash = ((hash << 5) - hash) + serviceTitle.charCodeAt(i); hash |= 0 }
     return serviceImages[(Math.abs(hash) + blockIndex) % serviceImages.length]
@@ -14,20 +25,37 @@ function getImageForBlock(serviceTitle: string, blockIndex: number): string {
 
 interface ServiceBlock { title: string; desc: string; points: string[]; imageColor: string }
 interface FaqItem { q: string; a: string }
-interface ServicePageData { breadcrumb: string; headline: string; intro: string; blocks: ServiceBlock[]; relatedServices: { title: string; href: string }[]; faq?: FaqItem[] }
+type ServiceDemo = 'chatbot'
+interface ServicePageData {
+    slug?: string
+    breadcrumb: string
+    headline: string
+    intro: string
+    blocks: ServiceBlock[]
+    relatedServices: { title: string; href: string }[]
+    faq?: FaqItem[]
+    demo?: ServiceDemo
+    /** Set of "<slug>-<n>" tokens for which a generated image exists. */
+    generatedImages?: string[]
+}
 
 function FaqAccordion({item, index}: { item: FaqItem; index: number }) {
     const [open, setOpen] = useState(false)
+    const panelId = `faq-panel-${index}`
+    const buttonId = `faq-trigger-${index}`
     return (
         <div className={`border-b border-black/15 ${index === 0 ? 'border-t' : ''}`}>
             <button
+                id={buttonId}
                 onClick={() => setOpen(!open)}
+                aria-expanded={open}
+                aria-controls={panelId}
                 className="w-full flex items-center justify-between py-5 px-2 text-left cursor-pointer group"
             >
                 <span className="text-base md:text-xl font-vcr text-black/80 group-hover:text-black transition-colors pr-4">
                     {item.q}
                 </span>
-                <span className="shrink-0 w-6 h-6 flex items-center justify-center">
+                <span className="shrink-0 w-6 h-6 flex items-center justify-center" aria-hidden="true">
                     {/* Crosshair +/- icon */}
                     <span className="relative w-3 h-3">
                         <span className="absolute top-1/2 left-0 w-full h-px bg-black/40 -translate-y-1/2"/>
@@ -35,7 +63,12 @@ function FaqAccordion({item, index}: { item: FaqItem; index: number }) {
                     </span>
                 </span>
             </button>
-            <div className={`overflow-hidden transition-all duration-300 ${open ? 'max-h-40 pb-5' : 'max-h-0'}`}>
+            <div
+                id={panelId}
+                role="region"
+                aria-labelledby={buttonId}
+                hidden={!open}
+                className={`overflow-hidden transition-all duration-300 ${open ? 'max-h-40 pb-5' : 'max-h-0'}`}>
                 <p className="text-sm text-black/50 leading-relaxed px-2">{item.a}</p>
             </div>
         </div>
@@ -43,6 +76,7 @@ function FaqAccordion({item, index}: { item: FaqItem; index: number }) {
 }
 
 export default function ServicePage({data}: { data: ServicePageData }) {
+    const generatedSet = new Set(data.generatedImages || [])
     return (
         <main className="bg-white text-black min-h-screen" data-nav-theme="light">
             <div className="mx-4 md:mx-8 lg:mx-12 border-l border-r border-black/15">
@@ -68,14 +102,19 @@ export default function ServicePage({data}: { data: ServicePageData }) {
                 {/* ── Content blocks ── */}
                 {data.blocks.map((block, i) => {
                     const isEven = i % 2 === 0
-                    const imgSrc = getImageForBlock(data.breadcrumb, i)
+                    const imgSrc = getImageForBlock(data.slug, data.breadcrumb, i, generatedSet)
                     return (
                         <div key={i} className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-b border-black/15">
                             <div className={`grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center ${!isEven ? 'md:[direction:rtl]' : ''}`}>
-                                <div className={`aspect-[4/3] rounded-sm overflow-hidden relative ${!isEven ? 'md:[direction:ltr]' : ''}`}>
+                                <RevealOnView
+                                    direction={isEven ? 'left' : 'right'}
+                                    className={`aspect-[4/3] rounded-sm overflow-hidden relative ${!isEven ? 'md:[direction:ltr]' : ''}`}>
                                     <Image src={imgSrc} alt={block.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw"/>
-                                </div>
-                                <div className={!isEven ? 'md:[direction:ltr]' : ''}>
+                                </RevealOnView>
+                                <RevealOnView
+                                    direction={isEven ? 'right' : 'left'}
+                                    delay={120}
+                                    className={!isEven ? 'md:[direction:ltr]' : ''}>
                                     <h2 className="text-2xl md:text-3xl font-vcr-mono mb-6 leading-tight">{block.title}</h2>
                                     <p className="text-sm text-black/50 leading-relaxed mb-8">{block.desc}</p>
                                     <ul className="space-y-0">
@@ -83,11 +122,34 @@ export default function ServicePage({data}: { data: ServicePageData }) {
                                             <li key={pi} className={`py-3 pl-4 text-sm text-black/60 font-mono ${pi < block.points.length - 1 ? 'border-b border-black/10' : ''}`}>{point}</li>
                                         ))}
                                     </ul>
-                                </div>
+                                </RevealOnView>
                             </div>
                         </div>
                     )
                 })}
+
+                {/* ── Interactive demo (when service has one) ── */}
+                {data.demo === 'chatbot' && (
+                    <div className="px-6 md:px-12 lg:px-16 py-16 md:py-24 border-b border-black/15 bg-black/[0.02]">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-start">
+                            <div className="md:col-span-5">
+                                <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-black/40 mb-3">Demo // In azione</p>
+                                <h3 className="text-3xl md:text-4xl font-vcr leading-tight mb-4" style={{fontWeight: 900}}>
+                                    Provalo. Senza email, senza promesse vuote.
+                                </h3>
+                                <p className="text-sm text-black/55 leading-relaxed">
+                                    Questa è una conversazione scriptata che mostra il flusso reale di qualificazione lead:
+                                    raccoglie il contesto, suggerisce il pacchetto giusto, fissa l’appuntamento. Tutto integrato nel tuo CRM.
+                                </p>
+                            </div>
+                            <div className="md:col-span-7">
+                                <ErrorBoundary label="chatbot-demo">
+                                    <ChatbotDemo/>
+                                </ErrorBoundary>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* ── FAQ Section with crosshair borders ── */}
                 {data.faq && data.faq.length > 0 && (

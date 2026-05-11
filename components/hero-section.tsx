@@ -5,8 +5,14 @@ import {OrbitControls} from '@react-three/drei'
 import * as THREE from 'three'
 import {useRef, useMemo, useEffect, useState, useCallback} from 'react'
 
-const PARTICLE_COUNT = 5000
+const PARTICLE_COUNT_DESKTOP = 5000
+const PARTICLE_COUNT_MOBILE = 2000
 const SPHERE_RADIUS = 2.5
+
+function isMobileDevice(): boolean {
+    if (typeof window === 'undefined') return false
+    return window.innerWidth < 768 || (window.matchMedia?.('(pointer: coarse)').matches ?? false)
+}
 
 const floatingObjects = [
     {id: 'ai', geometry: 'icosahedron' as const, scale: 0.6, orbitRadius: 4.5, orbitSpeed: 0.15, orbitOffset: 0, yBase: 1, text: 'SOLUZIONI AI\nSistemi intelligenti\nche trasformano il business', textPos: [6.5, 1.5, 0] as [number, number, number]},
@@ -24,11 +30,13 @@ const scrollTexts = [
 
 // ── Particle Sphere ──
 function ParticleSphere({scrollProgress}: { scrollProgress: React.MutableRefObject<number> }) {
+    const particleCount = useMemo(() => isMobileDevice() ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP, [])
+
     const {positions, dispersed, offsets} = useMemo(() => {
-        const pos = new Float32Array(PARTICLE_COUNT * 3)
-        const disp = new Float32Array(PARTICLE_COUNT * 3)
-        const off = new Float32Array(PARTICLE_COUNT * 3)
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const pos = new Float32Array(particleCount * 3)
+        const disp = new Float32Array(particleCount * 3)
+        const off = new Float32Array(particleCount * 3)
+        for (let i = 0; i < particleCount; i++) {
             const theta = Math.random() * Math.PI * 2
             const phi = Math.acos(2 * Math.random() - 1)
             pos[i * 3] = SPHERE_RADIUS * Math.sin(phi) * Math.cos(theta)
@@ -43,7 +51,7 @@ function ParticleSphere({scrollProgress}: { scrollProgress: React.MutableRefObje
             off[i * 3 + 2] = Math.random() * Math.PI * 2
         }
         return {positions: pos, dispersed: disp, offsets: off}
-    }, [])
+    }, [particleCount])
 
     const geometry = useMemo(() => {
         const geo = new THREE.BufferGeometry()
@@ -173,6 +181,9 @@ export default function HeroSection() {
             const gsap = (await import('gsap')).default
             const {ScrollTrigger} = await import('gsap/ScrollTrigger')
             gsap.registerPlugin(ScrollTrigger)
+            // iOS URL bar collapse causes the viewport (and 100vh) to change mid-scroll,
+            // which retriggers ScrollTrigger and jumps the sticky canvas. Ignore those resizes.
+            ScrollTrigger.config({ignoreMobileResize: true})
             if (!heroRef.current || !canvasWrapRef.current) return
 
             // Master scroll progress
@@ -235,11 +246,17 @@ export default function HeroSection() {
         return () => { triggers.forEach(t => t?.kill?.()) }
     }, [])
 
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => {setIsMobile(isMobileDevice())}, [])
+
     return (
+        // h-[100svh] uses the small viewport height — iOS URL bar collapse doesn't change it.
         <div ref={heroRef} className="relative" style={{height: '400vh'}}>
-            <div ref={canvasWrapRef} className="sticky top-0 h-screen w-full">
-                <Canvas camera={{position: [0, 0, 8], fov: 50}} dpr={[1, 2]}
-                        gl={{antialias: true, alpha: false}} style={{background: '#000000'}}>
+            <div ref={canvasWrapRef} className="sticky top-0 w-full h-[100svh]">
+                <Canvas camera={{position: [0, 0, 8], fov: 50}}
+                        dpr={isMobile ? [1, 1.5] : [1, 2]}
+                        gl={{antialias: true, alpha: false, powerPreference: 'high-performance'}}
+                        style={{background: '#000000'}}>
                     <Scene scrollProgress={scrollProgress}/>
                 </Canvas>
 
@@ -248,7 +265,7 @@ export default function HeroSection() {
                     {scrollTexts.map((t, i) => (
                         <div key={i} ref={el => { textRefs.current[i] = el }}
                              className={`absolute bottom-16 max-w-lg px-8 ${t.side === 'left' ? 'left-0' : 'right-0 text-right'}`}
-                             style={{willChange: 'transform, opacity, filter'}}>
+                             style={{willChange: 'transform, opacity'}}>
                             <h1 className="text-3xl md:text-5xl leading-[1.1] mb-3 whitespace-pre-line font-vcr" style={{fontWeight: 500}}>{t.heading}</h1>
                             <p className="text-sm text-white/40 font-mono uppercase tracking-[0.15em]">{t.sub}</p>
                         </div>

@@ -114,7 +114,7 @@ export default function ServicesSlider() {
                                     <h3 className="text-2xl md:text-3xl font-bold mt-auto mb-5 leading-tight tracking-tight font-vcr">
                                         {ind.title}
                                     </h3>
-                                    <p className="text-xs text-white/30 font-mono leading-relaxed mb-8">
+                                    <p className="text-xs text-white/55 font-mono leading-relaxed mb-8">
                                         {ind.body}
                                     </p>
                                     <div className="self-end mt-auto">

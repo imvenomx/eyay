@@ -3,6 +3,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import Link from 'next/link'
 import {useLanguage} from '@/lib/language-context'
 import BinaryHover from '@/components/binary-hover'
+import ScrambleOnView from '@/components/scramble-on-view'
 
 const stepKeys = ['process.s1', 'process.s2', 'process.s3', 'process.s4']
 
@@ -23,7 +24,7 @@ function StepCard({titleKey, descKey}: {titleKey: string; descKey: string}) {
             <div className="absolute inset-0 bg-black origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-400 ease-out"/>
             <div className="relative z-10 pt-8 pb-6 px-6 md:px-8">
                 <h3 className="text-lg mb-5 font-vcr group-hover:text-white transition-colors duration-300">{display}</h3>
-                <p className="text-[12px] text-black/40 group-hover:text-white/50 leading-relaxed transition-colors duration-300">{t(descKey)}</p>
+                <p className="text-[12px] text-black/55 group-hover:text-white/65 leading-relaxed transition-colors duration-300">{t(descKey)}</p>
             </div>
         </div>
     )
@@ -44,7 +45,9 @@ export default function ProcessBento() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0">
                         <div className="md:border-r border-black/15 md:pr-12">
                             <span className="inline-block w-2 h-2 rounded-full bg-black mr-3 relative -top-0.5"/>
-                            <span className="text-3xl md:text-4xl leading-snug inline font-vcr">{t('process.heading')}</span>
+                            <span className="text-3xl md:text-4xl leading-snug inline font-vcr">
+                                <ScrambleOnView>{t('process.heading')}</ScrambleOnView>
+                            </span>
                         </div>
                         <div className="text-[13px] text-black/50 leading-relaxed md:pl-12 md:pt-2">{t('process.desc')}</div>
                     </div>

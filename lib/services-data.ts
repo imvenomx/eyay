@@ -1,5 +1,7 @@
 export interface FaqItem { q: string; a: string }
 
+export type ServiceDemo = 'chatbot'
+
 export interface ServiceData {
     slug: string
     title: string
@@ -8,6 +10,7 @@ export interface ServiceData {
     blocks: { title: string; desc: string; points: string[]; imageColor: string }[]
     relatedSlugs: string[]
     faq?: FaqItem[]
+    demo?: ServiceDemo
 }
 
 export const allServices: ServiceData[] = [
@@ -22,6 +25,7 @@ export const allServices: ServiceData[] = [
             {title: 'Analisi e ottimizzazione', desc: 'Monitora ogni conversazione, identifica i punti di abbandono e migliora continuamente le prestazioni.', points: ['Analisi delle conversazioni', 'Dashboard delle performance', 'Test A/B dei flussi', 'Miglioramento continuo'], imageColor: '#1a1a2e'},
         ],
         relatedSlugs: ['ai-voice-agents', 'rag-knowledge-ai', 'custom-gpts', 'crm-erp-integration', 'email-automation'],
+        demo: 'chatbot',
         faq: [
             {q: 'Quanto tempo serve per implementare un chatbot AI?', a: 'Generalmente tra 2 e 6 settimane, a seconda della complessità e delle integrazioni richieste.'},
             {q: 'Il chatbot può essere integrato con il mio CRM?', a: 'Sì, integriamo il chatbot con i principali CRM come HubSpot e Salesforce per sincronizzare i lead in tempo reale.'},

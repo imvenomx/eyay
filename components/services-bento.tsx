@@ -3,6 +3,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import Link from 'next/link'
 import {useLanguage} from '@/lib/language-context'
 import BinaryHover from '@/components/binary-hover'
+import ScrambleOnView from '@/components/scramble-on-view'
 
 const columns = [
     {titleKey: 'services.col1', descKey: 'services.col1.desc', items: [{label: 'Chatbot AI', href: '/service/ai-chatbots'}, {label: 'Agenti Vocali AI', href: '/service/ai-voice-agents'}, {label: 'AI Basata sulla Conoscenza', href: '/service/rag-knowledge-ai'}, {label: 'GPT Personalizzati', href: '/service/custom-gpts'}, {label: 'Piattaforme AI White-Label', href: '/service/white-label-ai'}]},
@@ -42,7 +43,9 @@ export default function ServicesBento() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0">
                         <div className="md:border-r border-black/15 md:pr-12">
                             <span className="inline-block w-2 h-2 rounded-full bg-black mr-3 relative -top-0.5"/>
-                            <span className="text-3xl md:text-4xl leading-snug inline font-vcr">{t('services.heading')}</span>
+                            <span className="text-3xl md:text-4xl leading-snug inline font-vcr">
+                                <ScrambleOnView>{t('services.heading')}</ScrambleOnView>
+                            </span>
                         </div>
                         <div className="text-[13px] text-black/50 leading-relaxed md:pl-12 md:pt-2">{t('services.desc')}</div>
                     </div>
@@ -56,7 +59,7 @@ export default function ServicesBento() {
                     {columns.map((col, ci) => (
                         <div key={ci} className={`pt-8 pb-6 ${ci < columns.length - 1 ? 'md:border-r border-black/15' : ''} ${ci > 0 ? 'md:pl-10' : ''} ${ci < columns.length - 1 ? 'md:pr-10' : ''}`}>
                             <h3 className="text-lg mb-5 font-vcr">{t(col.titleKey)}</h3>
-                            <p className="text-[12px] text-black/40 leading-relaxed mb-8">{t(col.descKey)}</p>
+                            <p className="text-[12px] text-black/55 leading-relaxed mb-8">{t(col.descKey)}</p>
                             <div>{col.items.map(item => <ServiceItem key={item.label} label={item.label} href={item.href}/>)}</div>
                         </div>
                     ))}

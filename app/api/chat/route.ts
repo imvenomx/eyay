@@ -3,6 +3,10 @@ import {NextRequest, NextResponse} from 'next/server'
 const MOONSHOT_API_KEY = process.env.MOONSHOT_API_KEY
 const MOONSHOT_URL = 'https://api.moonshot.ai/v1/chat/completions'
 
+export async function GET() {
+    return NextResponse.json({available: !!MOONSHOT_API_KEY})
+}
+
 const SYSTEM_PROMPT = `Sei l'assistente AI di Eey Aay, un'azienda B2B specializzata in AI, automazione e trasformazione digitale. Rispondi SEMPRE in italiano.
 
 Il tuo compito è aiutare i visitatori a capire come Eey Aay può aiutare la loro azienda e suggerire il servizio più adatto.
@@ -33,7 +37,7 @@ Regole:
 
 export async function POST(req: NextRequest) {
     if (!MOONSHOT_API_KEY) {
-        return NextResponse.json({error: 'API key not configured'}, {status: 500})
+        return NextResponse.json({error: 'chat_unavailable'}, {status: 503})
     }
 
     try {

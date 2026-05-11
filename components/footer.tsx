@@ -3,50 +3,44 @@ import Link from 'next/link'
 import Image from 'next/image'
 import React, {useState, useRef, useCallback} from "react"
 import BinaryHover from '@/components/binary-hover'
+import {useLanguage} from '@/lib/language-context'
+import {SOCIAL_LINKS} from '@/lib/social-links'
+import {serviceColumns, pageLinks} from '@/lib/navigation'
 
-const serviceColumns = [
-    {
-        title: 'Soluzioni AI',
-        items: [
-            {label: 'Chatbot AI', href: '/service/ai-chatbots'},
-            {label: 'Agenti Vocali AI', href: '/service/ai-voice-agents'},
-            {label: 'AI Basata sulla Conoscenza', href: '/service/rag-knowledge-ai'},
-            {label: 'GPT Personalizzati', href: '/service/custom-gpts'},
-            {label: 'AI White-Label', href: '/service/white-label-ai'},
-        ],
-    },
-    {
-        title: 'Automazione',
-        items: [
-            {label: 'Sviluppo Web', href: '/service/web-development'},
-            {label: 'Automazione RPA', href: '/service/rpa-automation'},
-            {label: 'Integrazione CRM', href: '/service/crm-erp-integration'},
-            {label: 'Automazione Email', href: '/service/email-automation'},
-            {label: 'GoHighLevel', href: '/service/gohighlevel'},
-        ],
-    },
-    {
-        title: 'Crescita',
-        items: [
-            {label: 'SEO & SEO Locale', href: '/service/seo'},
-            {label: 'E-commerce', href: '/service/ecommerce'},
-            {label: 'Dati & BI', href: '/service/bi-machine-learning'},
-            {label: 'Formazione AI', href: '/service/ai-training'},
-        ],
-    },
-]
-
-const pageLinks = [
-    {label: 'Chi Siamo', href: '/about'},
-    {label: 'Servizi', href: '/#services'},
-    {label: 'Industrie', href: '/#industries'},
-    {label: 'Contatti', href: '/contact'},
-]
+type NewsletterStatus = 'idle' | 'submitting' | 'success' | 'duplicate' | 'error'
 
 export default function FooterSection() {
+    const {t} = useLanguage()
     const [email, setEmail] = useState('')
+    const [newsletterStatus, setNewsletterStatus] = useState<NewsletterStatus>('idle')
     const footerRef = useRef<HTMLElement>(null)
     const spotlightRef = useRef<HTMLDivElement>(null)
+
+    const handleNewsletter = useCallback(async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (newsletterStatus === 'submitting') return
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+            setNewsletterStatus('error')
+            return
+        }
+        setNewsletterStatus('submitting')
+        try {
+            const res = await fetch('/api/newsletter', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email: email.trim()}),
+            })
+            const data = await res.json().catch(() => ({}))
+            if (!res.ok) {
+                setNewsletterStatus('error')
+                return
+            }
+            setNewsletterStatus(data.duplicate ? 'duplicate' : 'success')
+            setEmail('')
+        } catch {
+            setNewsletterStatus('error')
+        }
+    }, [email, newsletterStatus])
 
     const handleMouseMove = useCallback((e: React.MouseEvent) => {
         if (!spotlightRef.current || !footerRef.current) return
@@ -83,24 +77,43 @@ export default function FooterSection() {
 
                     {/* Right: Newsletter */}
                     <div>
-                        <p className="text-base mb-2">Iscriviti alla newsletter</p>
+                        <p className="text-base mb-2">{t('footer.newsletter')}</p>
                         <p className="text-xs font-mono text-white/40 uppercase tracking-[0.15em] mb-6">
-                            LA CONVERSAZIONE CHE NON POSSIAMO SMETTERE DI INIZIARE
+                            {t('footer.newsletter.sub')}
                         </p>
-                        <label className="block text-xs font-mono text-white/50 uppercase tracking-wider mb-2">
-                            EMAIL *
-                        </label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                            placeholder="johndoe@email.com"
-                            className="w-full max-w-sm bg-white/5 border border-white/10 rounded-none px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 mb-4 font-mono"
-                        />
-                        <br/>
-                        <button className="px-5 py-2 rounded-full border border-white/20 text-xs font-vcr uppercase tracking-wider hover:bg-white hover:text-black transition-all duration-300">
-                            INVIA
-                        </button>
+                        <form onSubmit={handleNewsletter} noValidate>
+                            <label htmlFor="newsletter-email" className="block text-xs font-mono text-white/50 uppercase tracking-wider mb-2">
+                                EMAIL *
+                            </label>
+                            <input
+                                id="newsletter-email"
+                                type="email"
+                                value={email}
+                                onChange={e => {
+                                    setEmail(e.target.value)
+                                    if (newsletterStatus !== 'idle' && newsletterStatus !== 'submitting') setNewsletterStatus('idle')
+                                }}
+                                placeholder={t('newsletter.placeholder')}
+                                disabled={newsletterStatus === 'submitting'}
+                                className="w-full max-w-sm bg-white/5 border border-white/10 rounded-none px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 mb-4 font-mono disabled:opacity-50"
+                            />
+                            <br/>
+                            <button
+                                type="submit"
+                                disabled={newsletterStatus === 'submitting'}
+                                className="px-5 py-2 rounded-full border border-white/20 text-xs font-vcr uppercase tracking-wider hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-white">
+                                {newsletterStatus === 'submitting' ? t('newsletter.sending') : 'INVIA'}
+                            </button>
+                            {newsletterStatus === 'success' && (
+                                <p className="mt-3 text-[10px] font-mono uppercase tracking-wider text-green-400">{t('newsletter.success')}</p>
+                            )}
+                            {newsletterStatus === 'duplicate' && (
+                                <p className="mt-3 text-[10px] font-mono uppercase tracking-wider text-white/50">{t('newsletter.duplicate')}</p>
+                            )}
+                            {newsletterStatus === 'error' && (
+                                <p className="mt-3 text-[10px] font-mono uppercase tracking-wider text-red-400">{t('newsletter.error')}</p>
+                            )}
+                        </form>
                     </div>
                 </div>
             </div>
@@ -145,11 +158,15 @@ export default function FooterSection() {
             {/* Social links row */}
             <div className="w-full px-8 md:px-16 lg:px-20 border-t border-white/10 py-6">
                 <div className="flex flex-wrap gap-3">
-                    {['INSTAGRAM', 'FACEBOOK', 'LINKEDIN'].map(s => (
-                        <span key={s}
-                              className="px-4 py-1.5 rounded-full border border-white/10 text-[10px] font-mono uppercase tracking-wider text-white/50 hover:text-white hover:border-white/30 transition-colors cursor-pointer">
-                            <BinaryHover>{s}</BinaryHover>
-                        </span>
+                    {SOCIAL_LINKS.map(s => (
+                        <a key={s.label}
+                           href={s.href}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           aria-label={`Eey Aay su ${s.label}`}
+                           className="px-4 py-1.5 rounded-full border border-white/10 text-[10px] font-mono uppercase tracking-wider text-white/50 hover:text-white hover:border-white/30 transition-colors">
+                            <BinaryHover>{s.label.toUpperCase()}</BinaryHover>
+                        </a>
                     ))}
                 </div>
             </div>
@@ -157,10 +174,10 @@ export default function FooterSection() {
             {/* Bottom bar */}
             <div className="w-full px-8 md:px-16 lg:px-20 border-t border-white/10 py-5">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-                    <div className="flex flex-wrap items-center gap-4 text-[11px] text-white/30">
+                    <div className="flex flex-wrap items-center gap-4 text-[11px] text-white/50">
                         <span>&copy; 2026 Eey Aay. All Rights Reserved.</span>
-                        <Link href="#" className="hover:text-white/60 transition-colors">Privacy</Link>
-                        <Link href="#" className="hover:text-white/60 transition-colors">Termini &amp; Condizioni</Link>
+                        <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
+                        <Link href="/terms" className="hover:text-white/60 transition-colors">Termini &amp; Condizioni</Link>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] text-white/60 font-vcr">
                         <span className="w-1.5 h-1.5 rounded-full bg-white/60"/>

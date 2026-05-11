@@ -1,7 +1,10 @@
 'use client'
-import {createContext, useContext, useState, ReactNode, useCallback} from 'react'
+import {createContext, useContext, useState, ReactNode, useCallback, useEffect} from 'react'
 
 type Lang = 'it' | 'en'
+
+const STORAGE_KEY = 'eyay_lang'
+const COOKIE_KEY = 'eyay_lang'
 
 const LanguageContext = createContext<{
     lang: Lang
@@ -10,6 +13,25 @@ const LanguageContext = createContext<{
 }>({lang: 'it', setLang: () => {}, t: (k) => k})
 
 export const useLanguage = () => useContext(LanguageContext)
+
+function readStoredLang(): Lang | null {
+    if (typeof window === 'undefined') return null
+    try {
+        const stored = window.localStorage.getItem(STORAGE_KEY)
+        if (stored === 'it' || stored === 'en') return stored
+    } catch {}
+    // Fallback to cookie
+    const match = document.cookie.match(/(?:^|; )eyay_lang=(it|en)/)
+    return match ? (match[1] as Lang) : null
+}
+
+function persistLang(lang: Lang) {
+    if (typeof window === 'undefined') return
+    try { window.localStorage.setItem(STORAGE_KEY, lang) } catch {}
+    // 1-year cookie, lax samesite — useful for future server-side reads
+    const maxAge = 60 * 60 * 24 * 365
+    document.cookie = `${COOKIE_KEY}=${lang}; path=/; max-age=${maxAge}; SameSite=Lax`
+}
 
 // ── All translations ──
 const translations: Record<string, Record<Lang, string>> = {
@@ -96,10 +118,40 @@ const translations: Record<string, Record<Lang, string>> = {
     'contact.message': {it: 'MESSAGGIO *', en: 'MESSAGE *'},
     'contact.send': {it: 'INVIA MESSAGGIO', en: 'SEND MESSAGE'},
     'contact.info': {it: 'Informazioni', en: 'Information'},
+    'contact.sending': {it: 'INVIO IN CORSO…', en: 'SENDING…'},
+    'contact.success.title': {it: 'Messaggio inviato', en: 'Message sent'},
+    'contact.success.desc': {it: 'Grazie! Ti risponderemo entro 24 ore.', en: "Thanks! We'll get back to you within 24 hours."},
+    'contact.error.generic': {it: 'Qualcosa è andato storto. Riprova.', en: 'Something went wrong. Please try again.'},
+    'contact.error.name': {it: 'Inserisci il tuo nome', en: 'Please enter your name'},
+    'contact.error.email': {it: 'Email non valida', en: 'Invalid email'},
+    'contact.error.message': {it: 'Il messaggio deve avere almeno 10 caratteri', en: 'Message must be at least 10 characters'},
+    'contact.placeholder.name': {it: 'Mario Rossi', en: 'John Doe'},
+    'contact.placeholder.email': {it: 'mario@azienda.com', en: 'john@company.com'},
+    'contact.placeholder.company': {it: 'Nome azienda', en: 'Company name'},
+    'contact.placeholder.message': {it: 'Raccontaci del tuo progetto…', en: 'Tell us about your project…'},
+
+    // Newsletter
+    'newsletter.placeholder': {it: 'tu@email.com', en: 'you@email.com'},
+    'newsletter.success': {it: 'ISCRITTO. A PRESTO.', en: 'SUBSCRIBED. SEE YOU SOON.'},
+    'newsletter.duplicate': {it: 'GIÀ ISCRITTO', en: 'ALREADY SUBSCRIBED'},
+    'newsletter.error': {it: 'EMAIL NON VALIDA', en: 'INVALID EMAIL'},
+    'newsletter.sending': {it: 'INVIO…', en: 'SENDING…'},
 }
 
 export function LanguageProvider({children}: { children: ReactNode }) {
-    const [lang, setLang] = useState<Lang>('it')
+    const [lang, setLangState] = useState<Lang>('it')
+
+    // Hydrate from storage on mount so a previously-chosen language sticks across navigations.
+    useEffect(() => {
+        const stored = readStoredLang()
+        if (stored && stored !== lang) setLangState(stored)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    const setLang = useCallback((l: Lang) => {
+        setLangState(l)
+        persistLang(l)
+    }, [])
 
     const t = useCallback((key: string): string => {
         return translations[key]?.[lang] ?? key

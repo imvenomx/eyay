@@ -38,12 +38,15 @@ interface ChatModalProps {
     onClose: () => void
 }
 
+type Availability = 'unknown' | 'available' | 'unavailable'
+
 export default function ChatModal({open, onClose}: ChatModalProps) {
     const [input, setInput] = useState('')
     const [messages, setMessages] = useState<Message[]>([
         {role: 'ai', text: 'Ciao! Come posso aiutarti oggi? Raccontami del tuo progetto e ti consiglierò la soluzione migliore.'}
     ])
     const [loading, setLoading] = useState(false)
+    const [availability, setAvailability] = useState<Availability>('unknown')
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -59,8 +62,18 @@ export default function ChatModal({open, onClose}: ChatModalProps) {
         return () => { document.documentElement.classList.remove('no-scroll') }
     }, [open])
 
+    useEffect(() => {
+        if (!open || availability !== 'unknown') return
+        let cancelled = false
+        fetch('/api/chat', {method: 'GET'})
+            .then(r => r.json())
+            .then(d => { if (!cancelled) setAvailability(d.available ? 'available' : 'unavailable') })
+            .catch(() => { if (!cancelled) setAvailability('unavailable') })
+        return () => { cancelled = true }
+    }, [open, availability])
+
     const handleSend = useCallback(async () => {
-        if (!input.trim() || loading) return
+        if (!input.trim() || loading || availability === 'unavailable') return
         const userMsg = input.trim()
         setInput('')
         setMessages(prev => [...prev, {role: 'user', text: userMsg}])
@@ -78,15 +91,20 @@ export default function ChatModal({open, onClose}: ChatModalProps) {
                 body: JSON.stringify({messages: history}),
             })
 
+            if (res.status === 503) {
+                setAvailability('unavailable')
+                setLoading(false)
+                return
+            }
             const data = await res.json()
-            const reply = data.reply || data.error || 'Mi dispiace, si è verificato un errore.'
+            const reply = data.reply || 'Mi dispiace, si è verificato un errore.'
             setMessages(prev => [...prev, {role: 'ai', text: reply}])
         } catch {
             setMessages(prev => [...prev, {role: 'ai', text: 'Mi dispiace, non riesco a connettermi al server. Riprova più tardi.'}])
         }
 
         setLoading(false)
-    }, [input, loading, messages])
+    }, [input, loading, messages, availability])
 
     return (
         <div className={`fixed inset-0 z-[9997] flex items-center justify-center transition-all duration-300 ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
@@ -117,6 +135,40 @@ export default function ChatModal({open, onClose}: ChatModalProps) {
                     </button>
                 </div>
 
+                {availability === 'unavailable' ? (
+                    <div className="flex-1 flex flex-col items-center justify-center px-8 py-10 text-center">
+                        <div className="flex items-center gap-2 mb-5">
+                            <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"/>
+                            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-yellow-400/80">
+                                STATUS // OFFLINE
+                            </span>
+                        </div>
+                        <p className="text-2xl md:text-3xl font-vcr mb-3" style={{fontWeight: 900}}>
+                            Chat in arrivo
+                        </p>
+                        <p className="text-sm text-white/60 leading-relaxed max-w-sm mb-8 font-mono">
+                            L’assistente AI è in fase di configurazione. Nel frattempo scrivici via email o usa il form di contatto e ti rispondiamo entro 24 ore.
+                        </p>
+                        <div className="flex flex-wrap gap-3 justify-center">
+                            <Link href="/contact" onClick={onClose}
+                                  className="relative inline-flex items-center gap-2 px-5 py-2.5 bg-white text-black font-vcr text-xs uppercase tracking-[0.2em] hover:bg-white/90 transition-colors">
+                                <span className="absolute top-0 left-0 w-2.5 h-px bg-black/30"/>
+                                <span className="absolute top-0 left-0 w-px h-2.5 bg-black/30"/>
+                                <span className="absolute top-0 right-0 w-2.5 h-px bg-black/30"/>
+                                <span className="absolute top-0 right-0 w-px h-2.5 bg-black/30"/>
+                                <span className="absolute bottom-0 left-0 w-2.5 h-px bg-black/30"/>
+                                <span className="absolute bottom-0 left-0 w-px h-2.5 bg-black/30"/>
+                                <span className="absolute bottom-0 right-0 w-2.5 h-px bg-black/30"/>
+                                <span className="absolute bottom-0 right-0 w-px h-2.5 bg-black/30"/>
+                                Apri form →
+                            </Link>
+                            <a href="mailto:hello@eeyaay.com"
+                               className="inline-flex items-center gap-2 px-5 py-2.5 border border-white/15 hover:border-white/40 font-vcr text-xs uppercase tracking-[0.2em] text-white/70 hover:text-white transition-colors">
+                                Email
+                            </a>
+                        </div>
+                    </div>
+                ) : <>
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 scrollbar-hide">
                     {messages.map((msg, i) => (
@@ -172,6 +224,7 @@ export default function ChatModal({open, onClose}: ChatModalProps) {
                         </button>
                     </div>
                 </div>
+                </>}
             </div>
         </div>
     )
